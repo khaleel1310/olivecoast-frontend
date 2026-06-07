@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router'; // Imports your Day 3 central router configurations
 import Footer from './components/Footer';
