@@ -53,7 +53,16 @@ export const OwnerDashboard: React.FC = () => {
         api.get("/menu"),
       ]);
       setOrders(ordersRes.data);
-      setCategories(menuRes.data);
+      
+      // Sanitizing array structure cleanly
+      const rawMenuData = menuRes.data;
+      if (Array.isArray(rawMenuData)) {
+        // Force fully flattens nested arrays if the upstream network proxy slips up
+        const flattened = rawMenuData.flat(Infinity);
+        setCategories(flattened);
+      } else {
+        setCategories([]);
+      }
     } catch (err) {
       console.error("Sync failed:", err);
     } finally {
@@ -151,6 +160,7 @@ export const OwnerDashboard: React.FC = () => {
       setNewPrice("");
       setNewDesc("");
       setNewImgUrl("");
+      setNewCategory("");
       setShowAddForm(false);
       fetchData();
     } catch (err) {
@@ -224,7 +234,7 @@ export const OwnerDashboard: React.FC = () => {
 
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         
-        {/* 📊 Mobile-Optimized Analytics Metric Banner Row */}
+        {/* 📊 Analytics Metric Banner Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {/* Card 1: Revenue */}
           <div className="bg-white p-4 sm:p-6 rounded-2xl border border-[#EFECE6] shadow-sm flex items-center justify-between gap-3">
@@ -233,7 +243,7 @@ export const OwnerDashboard: React.FC = () => {
                 Gross Sales Realized
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-[#0B2240] mt-1 truncate">
-                {grossRevenue.toFixed(2)} <span className="text-xs font-bold text-slate-500">JOD</span>
+                {grossRevenue.toFixed(2)} <span className="text-xs font-bold text-slate-500">USD</span>
               </h3>
             </div>
             <div className="p-3 bg-[#FAF8F5] rounded-xl text-[#607A41] shrink-0">
@@ -276,13 +286,13 @@ export const OwnerDashboard: React.FC = () => {
         <div className="flex border-b border-[#EFECE6] gap-6 sm:gap-8 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setActiveTab("orders")}
-            className={`pb-4 text-xs sm:text-sm font-bold uppercase tracking-wide border-b-2 shrink-0 ${activeTab === "orders" ? "border-[#0B2240] text-[#0B2240]" : "border-transparent text-slate-400"}`}
+            className={`pb-4 text-xs sm:text-sm font-bold uppercase tracking-wide border-b-2 shrink-0 ${activeTab === "orders" ? "border-b-[#0B2240] text-[#0B2240]" : "border-transparent text-slate-400"}`}
           >
             📊 Order Pipeline
           </button>
           <button
             onClick={() => setActiveTab("menu")}
-            className={`pb-4 text-xs sm:text-sm font-bold uppercase tracking-wide border-b-2 shrink-0 ${activeTab === "menu" ? "border-[#0B2240] text-[#0B2240]" : "border-transparent text-slate-400"}`}
+            className={`pb-4 text-xs sm:text-sm font-bold uppercase tracking-wide border-b-2 shrink-0 ${activeTab === "menu" ? "border-b-[#0B2240] text-[#0B2240]" : "border-transparent text-slate-400"}`}
           >
             📜 Menu Settings
           </button>
@@ -347,7 +357,7 @@ export const OwnerDashboard: React.FC = () => {
                           .join(", ")}
                       </td>
                       <td className="p-4 font-bold">
-                        {parseFloat(ord.total).toFixed(2)} JOD
+                        {parseFloat(ord.total).toFixed(2)} USD
                       </td>
                       <td className="p-4">
                         <StatusBadge status={ord.status} />
@@ -393,7 +403,7 @@ export const OwnerDashboard: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">
-                    Price (JOD) *
+                    Price (USD) *
                   </label>
                   <input
                     required
@@ -424,19 +434,18 @@ export const OwnerDashboard: React.FC = () => {
                   </select>
                 </div>
 
-                {/* 📸 FILE PICKER INTEGRATION */}
+                {/* 📸 FIXED MOBILE FILE PICKER */}
                 <div className="md:col-span-4">
                   <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">
                     Dish Image Upload
                   </label>
                   <div className="flex items-center gap-4 mt-1">
-                    <label className="flex items-center gap-2 px-4 py-2 bg-[#FAF8F5] hover:bg-[#EFECE6] border border border-[#DCD7CC] rounded-xl text-xs font-bold text-[#0B2240] cursor-pointer shadow-sm transition-all active:scale-95">
+                    <label className="flex items-center gap-2 px-4 py-2 bg-[#FAF8F5] hover:bg-[#EFECE6] border border-[#DCD7CC] rounded-xl text-xs font-bold text-[#0B2240] cursor-pointer shadow-sm transition-all active:scale-95">
                       <Upload size={14} />{" "}
-                      {uploadingNew ? "Streaming..." : "Take or Choose Photo"}
+                      {uploadingNew ? "Streaming..." : "Choose Photo"}
                       <input
                         type="file"
                         accept="image/*"
-                        capture="environment"
                         onChange={(e) => handleImageUpload(e, "NEW")}
                         className="hidden"
                         disabled={uploadingNew}
@@ -545,7 +554,7 @@ export const OwnerDashboard: React.FC = () => {
                                 </select>
                               </div>
 
-                              {/* 📸 INLINE EDIT FILE PICKER */}
+                              {/* 📸 FIXED INLINE EDIT MOBILE FILE PICKER */}
                               <div className="flex items-center gap-2 py-1">
                                 <label className="flex items-center gap-2 px-3 py-1.5 bg-[#FAF8F5] hover:bg-[#EFECE6] border border-[#DCD7CC] rounded-xl text-[11px] font-bold text-[#0B2240] cursor-pointer shadow-sm transition-all">
                                   <Upload size={12} />{" "}
@@ -553,7 +562,6 @@ export const OwnerDashboard: React.FC = () => {
                                   <input
                                     type="file"
                                     accept="image/*"
-                                    capture="environment"
                                     onChange={(e) =>
                                       handleImageUpload(e, "EDIT")
                                     }
@@ -606,7 +614,7 @@ export const OwnerDashboard: React.FC = () => {
                                   </p>
                                 </div>
                                 <span className="text-xs font-extrabold text-[#607A41] bg-[#FAF8F5] border px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap">
-                                  {parseFloat(item.price).toFixed(2)} JOD
+                                  {parseFloat(item.price).toFixed(2)} USD
                                 </span>
                               </div>
 
