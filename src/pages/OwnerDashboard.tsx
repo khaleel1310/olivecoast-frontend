@@ -55,20 +55,33 @@ export const OwnerDashboard: React.FC = () => {
         },
       };
 
-      const [ordersRes, menuRes] = await Promise.all([
+      // Fetching independently so a failure in Orders doesn't block the Menu visibility
+      const [ordersRes, menuRes] = await Promise.allSettled([
         api.get("/orders", config),
-        api.get("/menu"),
+        api.get("/menu", config), // Pass config to both for production consistency
       ]);
-      setOrders(ordersRes.data);
-      
-      // Sanitizing array structure cleanly
-      const rawMenuData = menuRes.data;
-      if (Array.isArray(rawMenuData)) {
-        // Force fully flattens nested arrays if the upstream network proxy slips up
-        const flattened = rawMenuData.flat(Infinity);
-        setCategories(flattened);
+
+      // Handle Orders Response
+      if (ordersRes.status === "fulfilled") {
+        setOrders(ordersRes.value.data);
       } else {
-        setCategories([]);
+        console.error("Order stream failed:", ordersRes.reason);
+      }
+
+      // Handle Menu Response
+      if (menuRes.status === "fulfilled") {
+        const rawMenuData = menuRes.value.data;
+        
+        // Defensive check: handle both direct arrays and nested { data: [] } wrappers
+        const menuArray = Array.isArray(rawMenuData) 
+          ? rawMenuData 
+          : (rawMenuData?.data && Array.isArray(rawMenuData.data)) 
+            ? rawMenuData.data 
+            : [];
+
+        setCategories(menuArray.flat(Infinity));
+      } else {
+        console.error("Menu stream failed:", menuRes.reason);
       }
     } catch (err) {
       console.error("Sync failed:", err);
