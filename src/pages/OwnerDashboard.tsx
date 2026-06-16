@@ -48,8 +48,15 @@ export const OwnerDashboard: React.FC = () => {
 
   const fetchData = async () => {
     try {
+      const storedToken = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      };
+
       const [ordersRes, menuRes] = await Promise.all([
-        api.get("/orders"),
+        api.get("/orders", config),
         api.get("/menu"),
       ]);
       setOrders(ordersRes.data);
@@ -97,8 +104,12 @@ export const OwnerDashboard: React.FC = () => {
     if (target === "EDIT") setUploadingEdit(true);
 
     try {
+      const storedToken = localStorage.getItem("token");
       const res = await api.post("/menu/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${storedToken}`,
+        },
       });
 
       const secureUrl = res.data.imageUrl;
@@ -127,12 +138,17 @@ export const OwnerDashboard: React.FC = () => {
     if (!editingItemId) return;
 
     try {
+      const storedToken = localStorage.getItem("token");
       await api.put(`/menu/${editingItemId}`, {
         name: editName,
         price: editPrice,
         description: editDesc,
         categoryId: editCategory,
         image: editImgUrl,
+      }, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        }
       });
       setEditingItemId(null);
       fetchData();
@@ -148,12 +164,17 @@ export const OwnerDashboard: React.FC = () => {
       return alert("Please fill in required fields.");
 
     try {
+      const storedToken = localStorage.getItem("token");
       await api.post("/menu", {
         name: newName,
         price: newPrice,
         description: newDesc,
         categoryId: newCategory,
         image: newImgUrl,
+      }, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        }
       });
 
       setNewName("");
@@ -177,7 +198,12 @@ export const OwnerDashboard: React.FC = () => {
     )
       return;
     try {
-      await api.delete(`/menu/${itemId}`);
+      const storedToken = localStorage.getItem("token");
+      await api.delete(`/menu/${itemId}`, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        }
+      });
       fetchData();
     } catch (err) {
       console.error(err);
@@ -510,7 +536,7 @@ export const OwnerDashboard: React.FC = () => {
                             onError={({ currentTarget }) => {
                               currentTarget.onerror = null;
                               currentTarget.src =
-                                "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60";
+                                "https://images.unsplash.com/photo-1546069901-ba9597e63c?w=500&auto=format&fit=crop&q=60";
                             }}
                           />
                         </div>
@@ -554,7 +580,7 @@ export const OwnerDashboard: React.FC = () => {
                                 </select>
                               </div>
 
-                              {/* 📸 FIXED INLINE EDIT MOBILE FILE PICKER */}
+                              /* 📸 FIXED INLINE EDIT MOBILE FILE PICKER */
                               <div className="flex items-center gap-2 py-1">
                                 <label className="flex items-center gap-2 px-3 py-1.5 bg-[#FAF8F5] hover:bg-[#EFECE6] border border-[#DCD7CC] rounded-xl text-[11px] font-bold text-[#0B2240] cursor-pointer shadow-sm transition-all">
                                   <Upload size={12} />{" "}
