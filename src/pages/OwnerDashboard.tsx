@@ -542,11 +542,16 @@ export const OwnerDashboard: React.FC = () => {
                         className="bg-white p-4 rounded-xl border border-[#EFECE6] shadow-sm flex gap-4 items-center"
                       >
                         <div className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden border border-[#EFECE6] shrink-0">
-                          <img
-                            src={item.imageUrl || "https://placehold.co/400x400/FAF8F5/0B2240?text=Dish"}
-                            alt={item.name}
-                            className="h-full w-full object-cover"
-                          />
+                          <img 
+          src={item.imageUrl} 
+          alt={item.name}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          // The Ultimate Infinite Loop Protection Shield:
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null; // ❌ Kill event listener immediately if file fails
+            currentTarget.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60'; // 🌍 Safe cloud backup thumbnail
+          }}
+        />
                         </div>
 
                         <div className="flex-grow min-w-0">
