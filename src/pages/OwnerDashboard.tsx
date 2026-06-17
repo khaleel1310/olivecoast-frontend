@@ -79,7 +79,7 @@ export const OwnerDashboard: React.FC = () => {
             ? rawMenuData.data 
             : [];
 
-        setCategories(menuArray.flat(Infinity));
+        setCategories(menuArray);
       } else {
         console.error("Menu stream failed:", menuRes.reason);
       }
@@ -543,14 +543,9 @@ export const OwnerDashboard: React.FC = () => {
                       >
                         <div className="h-20 w-20 bg-slate-100 rounded-lg overflow-hidden border border-[#EFECE6] shrink-0">
                           <img
-                            src={item.imageUrl || "/assets/placeholder.jpg"}
+                            src={item.imageUrl || "https://placehold.co/400x400/FAF8F5/0B2240?text=Dish"}
                             alt={item.name}
                             className="h-full w-full object-cover"
-                            onError={({ currentTarget }) => {
-                              currentTarget.onerror = null;
-                              currentTarget.src =
-                                "https://images.unsplash.com/photo-1546069901-ba9597e63c?w=500&auto=format&fit=crop&q=60";
-                            }}
                           />
                         </div>
 
