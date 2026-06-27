@@ -79,7 +79,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
 
   // 💬 BUILD DYNAMIC MESSENGER URL ROUTE PIPELINE
   const getMessengerUrl = () => {
-    const facebookPageName = "YOUR_FACEBOOK_PAGE_NAME"; // 👈 Put your page username here
+    const facebookPageName = "OliveCoastRest"; 
     const message = `Hi! I just placed order #${successOrderNumber} (${finalPrice} USD) on the website. Please confirm my order!`;
     return `https://m.me/${facebookPageName}?text=${encodeURIComponent(message)}`;
   };
