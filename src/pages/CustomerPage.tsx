@@ -186,7 +186,7 @@ export const CustomerPage: React.FC = () => {
                       description: item.description,
                       price: item.price,
                       isAvailable: item.isAvailable,
-                      imageUrl: item.imageUrl, // 🎯 FIXED: Relaying the cloud image string down into your custom card markup!
+                      imageUrl: item.imageUrl, // FIXED: Relaying the cloud image string down into your custom card markup!
                       category: { name: item.categoryName }
                     }} 
                   />

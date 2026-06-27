@@ -46,7 +46,7 @@ export const MenuCard: React.FC<{ item: MenuItemProps }> = ({ item }) => {
         <div className="flex justify-between items-start gap-2 mb-1.5">
           <h3 className="text-base font-bold text-[#0B2240] line-clamp-1">{item.name}</h3>
           <span className="text-base font-extrabold text-[#0B2240] shrink-0 whitespace-nowrap">
-            {numericPrice.toFixed(2)} JOD
+            {numericPrice.toFixed(2)} USD
           </span>
         </div>
 

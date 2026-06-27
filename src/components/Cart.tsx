@@ -24,6 +24,8 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   const [successOrderNumber, setSuccessOrderNumber] = useState<string | null>(
     null,
   );
+  // Cache total price temporarily so it stays visible on the success screen after clearing the cart
+  const [finalPrice, setFinalPrice] = useState<string>("0.00");
 
   if (!isOpen) return null;
 
@@ -40,6 +42,9 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
     }));
 
     try {
+      // Capture total before clearing cart state
+      const totalAmount = getTotalPrice().toFixed(2);
+
       const response = await api.post("/orders", {
         customerName,
         phoneNumber,
@@ -49,6 +54,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
       });
 
       const placedOrder = response.data.order;
+      setFinalPrice(totalAmount);
       setSuccessOrderNumber(placedOrder.orderNumber);
       clearCart();
     } catch (err: any) {
@@ -63,11 +69,19 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
 
   const handleCloseSuccess = () => {
     setSuccessOrderNumber(null);
+    setFinalPrice("0.00");
     setCustomerName("");
     setPhoneNumber("");
     setDeliveryAddress("");
     setNotes("");
     onClose();
+  };
+
+  // 💬 BUILD DYNAMIC MESSENGER URL ROUTE PIPELINE
+  const getMessengerUrl = () => {
+    const facebookPageName = "YOUR_FACEBOOK_PAGE_NAME"; // 👈 Put your page username here
+    const message = `Hi! I just placed order #${successOrderNumber} (${finalPrice} USD) on the website. Please confirm my order!`;
+    return `https://m.me/${facebookPageName}?text=${encodeURIComponent(message)}`;
   };
 
   return (
@@ -78,9 +92,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
         onClick={onClose}
       />
 
-      {/* 📱 UPGRADED RESPONSIVE DRAWER FRAME CONTAINER */}
-      {/* Mobile: Full screen width, slides up from bottom (bottom-0 h-[92vh] or h-full) */}
-      {/* Desktop (sm:): Right-aligned, fixed width drawer sidebar */}
+      {/* 📱 RESPONSIVE DRAWER FRAME CONTAINER */}
       <div className="absolute bottom-0 sm:top-0 sm:bottom-auto right-0 w-full sm:max-w-md h-[94vh] sm:h-full bg-white rounded-t-3xl sm:rounded-t-none sm:rounded-l-3xl shadow-2xl flex flex-col transition-transform duration-300 ease-out">
         {/* Mobile Swipe/Pull Indicator Accent Bar */}
         <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto mt-3 block sm:hidden shrink-0" />
@@ -108,8 +120,8 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
         <div className="flex-grow overflow-y-auto p-5 sm:p-6 space-y-6 scrollbar-none">
           {successOrderNumber ? (
             /* Success Confirmation View Card Layout */
-            <div className="flex flex-col items-center justify-center text-center py-12 space-y-4 h-full">
-              <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-2">
+            <div className="flex flex-col items-center justify-center text-center py-6 space-y-4 h-full justify-self-center">
+              <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-1">
                 <CheckCircle size={40} />
               </div>
               <h3 className="text-xl font-serif font-bold text-[#0B2240]">
@@ -120,11 +132,30 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                 tracking token:
               </p>
               <div className="bg-[#0B2240] text-amber-400 font-mono font-extrabold text-xl px-6 py-3 rounded-xl tracking-wider shadow-sm">
-                {successOrderNumber}
+                #{successOrderNumber}
               </div>
+
+              {/* ⚡ NEW: FACEBOOK CONVERSION CTA CALLOUT CONTAINER BOX */}
+              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 max-w-xs mt-2 text-left space-y-3">
+                <p className="text-[11px] text-blue-800 font-medium leading-relaxed">
+                  📢 <strong className="font-bold">Final Step:</strong> To guarantee immediate prep, click below to ping our team on Facebook Messenger with your order tracking number!
+                </p>
+                <a
+                  href={getMessengerUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 bg-[#0084FF] hover:bg-[#0072DD] text-white font-bold text-xs py-3 px-4 rounded-xl transition-colors shadow-sm"
+                >
+                  <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                    <path d="M12 2C6.477 2 2 6.145 2 11.257c0 2.914 1.46 5.518 3.753 7.185V22l3.428-1.883a11.216 11.216 0 002.819.356c5.523 0 10-4.145 10-9.256C22 6.145 17.523 2 12 2zm1.061 12.622l-2.556-2.733-4.99 2.733 5.485-5.83 2.61 2.733 4.935-2.733-5.484 5.83z" />
+                  </svg>
+                  Confirm via Messenger
+                </a>
+              </div>
+
               <button
                 onClick={handleCloseSuccess}
-                className="mt-6 w-full py-3 bg-[#0B2240] hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all"
+                className="w-full max-w-xs py-3 border border-slate-200 text-slate-500 hover:bg-slate-50 text-xs font-bold uppercase tracking-wider rounded-xl transition-all"
               >
                 Return to Menu
               </button>
@@ -155,7 +186,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                       {item.name}
                     </h4>
                     <p className="text-[#607A41] font-bold text-xs mt-0.5">
-                      {(item.price * item.quantity).toFixed(2)} JOD
+                      {(item.price * item.quantity).toFixed(2)} USD
                     </p>
                   </div>
 
@@ -220,7 +251,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                     Mobile Number
                   </label>
                   <input
-                    type="tel"
+                    type="text"
                     required
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
@@ -268,7 +299,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                 Total Amount:
               </span>
               <span className="text-xl font-black text-[#0B2240]">
-                {getTotalPrice().toFixed(2)} JOD
+                {getTotalPrice().toFixed(2)} USD
               </span>
             </div>
 
