@@ -1,6 +1,6 @@
 // 📁 frontend/src/pages/CustomerPage.tsx
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, Loader2, Calendar, Users, MapPin, Phone, User, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Loader2, Calendar, MapPin, Phone, User, Check, Minus, Plus } from 'lucide-react';
 import { api } from '../api/client';
 
 export const CustomerPage: React.FC = () => {
@@ -11,7 +11,7 @@ export const CustomerPage: React.FC = () => {
 
   // Booking Form State
   const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
-  const [guestCount, setGuestCount] = useState<number>(50);
+  const [guestCount, setGuestCount] = useState<number>(80);
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [eventDetails, setEventDetails] = useState({
     customerName: '',
@@ -30,7 +30,13 @@ export const CustomerPage: React.FC = () => {
         ]);
         
         const pkgData = pkgRes.data;
-        setPackages(Array.isArray(pkgData) ? pkgData : (pkgData?.data && Array.isArray(pkgData.data) ? pkgData.data : []));
+        const parsedPackages = Array.isArray(pkgData) ? pkgData : (pkgData?.data && Array.isArray(pkgData.data) ? pkgData.data : []);
+        setPackages(parsedPackages);
+        
+        // Auto-select the first package by default if available
+        if (parsedPackages.length > 0) {
+          setSelectedPackage(parsedPackages[0]);
+        }
 
         const addonData = addonRes.data;
         setAddons(Array.isArray(addonData) ? addonData : (addonData?.data && Array.isArray(addonData.data) ? addonData.data : []));
@@ -52,12 +58,16 @@ export const CustomerPage: React.FC = () => {
   };
 
   // Calculations
-  const packageTotal = selectedPackage ? parseFloat(selectedPackage.pricePerPerson) * guestCount : 0;
+  const packageUnitPrice = selectedPackage ? parseFloat(selectedPackage.pricePerPerson) : 0;
+  const packageTotal = packageUnitPrice * guestCount;
+  
   const addonsTotal = selectedAddons.reduce((sum, addonId) => {
     const addon = addons.find((a) => a.id === addonId);
     return sum + (addon ? parseFloat(addon.pricePerPerson) * guestCount : 0);
   }, 0);
+  
   const grandTotal = packageTotal + addonsTotal;
+  const effectivePerPerson = guestCount > 0 ? grandTotal / guestCount : 0;
 
   const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,9 +84,8 @@ export const CustomerPage: React.FC = () => {
         addons: selectedAddons.map(id => ({ addonId: id }))
       });
       alert(`Booking Request Submitted! Reference Number: ${response.data.bookingNumber}`);
-      setSelectedPackage(null);
       setSelectedAddons([]);
-      setGuestCount(50);
+      setGuestCount(80);
       setEventDetails({ customerName: '', customerPhone: '', eventDate: '', eventLocation: '' });
     } catch (err) {
       console.error(err);
@@ -86,19 +95,16 @@ export const CustomerPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF9F6] flex flex-col font-sans selection:bg-[#0B2240] selection:text-white">
+      {/* Brand Header */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#EFECE6] shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-28 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-xl overflow-hidden bg-[#FAF8F5] border border-[#EFECE6] p-1 flex items-center justify-center shrink-0">
-              <img src="/assets/Olive_Coast_Logo.jpg" alt="Olive Coast Emblem" className="h-full w-full object-contain scale-110" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-14 w-14 rounded-xl overflow-hidden bg-[#FAF8F5] border border-[#EFECE6] p-1 flex items-center justify-center shrink-0">
+              <img src="/assets/Olive_Coast_Logo.jpg" alt="Logo" className="h-full w-full object-contain scale-110" />
             </div>
-            <div className="flex flex-col">
-              <h1 className="text-xl md:text-2xl font-serif font-bold text-[#0B2240] tracking-wide leading-tight">
-                OLIVE COAST
-              </h1>
-              <span className="text-[10px] md:text-xs font-sans font-bold tracking-[0.2em] text-[#607A41] uppercase mt-0.5">
-                Premium Event Catering
-              </span>
+            <div>
+              <h1 className="text-xl font-serif font-bold text-[#0B2240] tracking-wide leading-tight">OLIVE COAST</h1>
+              <span className="text-[10px] font-sans font-bold tracking-[0.2em] text-[#607A41] uppercase block mt-0.5">Premium Event Catering</span>
             </div>
           </div>
         </div>
@@ -120,165 +126,250 @@ export const CustomerPage: React.FC = () => {
         )}
 
         {!loading && !error && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
+          <form onSubmit={handleSubmitBooking} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            {/* Left Column: Interactive Selection Steps */}
+            <div className="lg:col-span-2 space-y-10">
               
-              {/* Step 1: Packages */}
-              <section>
-                <h2 className="text-xl font-serif font-bold text-[#0B2240] mb-4 flex items-center gap-2">
-                  <span className="bg-[#0B2240] text-white h-6 w-6 rounded-full flex items-center justify-center text-xs font-sans">1</span>
-                  Select a Package
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {packages.map((pkg) => (
-                    <div 
-                      key={pkg.id} 
-                      onClick={() => setSelectedPackage(pkg)}
-                      className={`p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${
-                        selectedPackage?.id === pkg.id ? 'border-[#0B2240] ring-4 ring-[#0B2240]/5 bg-[#FAF8F5]/50' : 'border-[#EFECE6] hover:border-[#DCD7CC]'
+              {/* Step 1: Pick a package */}
+              <section className="space-y-4">
+                <h2 className="text-xl font-serif font-bold text-[#0B2240]">1. Pick a package</h2>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {packages.map((pkg) => {
+                    const isSelected = selectedPackage?.id === pkg.id;
+                    return (
+                      <div 
+                        key={pkg.id} 
+                        onClick={() => setSelectedPackage(pkg)}
+                        className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${
+                          isSelected ? 'border-[#A35C3A] ring-2 ring-[#A35C3A]/10 bg-white' : 'border-[#EFECE6] hover:border-[#DCD7CC]'
+                        }`}
+                      >
+                        {isSelected && (
+                          <div className="absolute top-3 right-3 w-6 h-6 bg-[#A35C3A] text-white rounded-full flex items-center justify-center shadow-sm">
+                            <Check size={14} strokeWidth={3} />
+                          </div>
+                        )}
+                        <div>
+                          <h3 className="font-bold text-[#0B2240] text-lg">{pkg.name}</h3>
+                          <p className="text-xs text-slate-500 mt-1 line-clamp-2">{pkg.description}</p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
+                          <span className="font-black text-[#0B2240] text-lg">${parseFloat(pkg.pricePerPerson).toFixed(2)}</span>
+                          <span className="text-xs text-slate-400 font-medium"> /guest</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Included Items / Features Box (Dynamic from DB) */}
+                {selectedPackage && selectedPackage.features && selectedPackage.features.length > 0 && (
+                  <div className="p-5 bg-[#F4EFE6]/60 rounded-2xl border border-[#EBE3D5] transition-all animate-fadeIn">
+                    <p className="text-xs font-bold text-[#0B2240] uppercase tracking-wider mb-3">Included in {selectedPackage.name}:</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {selectedPackage.features.map((feature: string, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2 text-xs text-[#2C3E50] font-medium">
+                          <Check size={14} className="text-[#A35C3A] shrink-0" />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* Step 2: How many guests? */}
+              <section className="space-y-4">
+                <h2 className="text-xl font-serif font-bold text-[#0B2240]">2. How many guests?</h2>
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center bg-white border border-[#EFECE6] rounded-2xl p-1.5 shadow-sm">
+                    <button 
+                      type="button" 
+                      onClick={() => setGuestCount(Math.max(10, guestCount - 5))}
+                      className="w-10 h-10 rounded-xl bg-[#FAF8F5] flex items-center justify-center text-[#0B2240] hover:bg-[#EFECE6] transition-colors"
+                    >
+                      <Minus size={16} />
+                    </button>
+                    <input 
+                      type="number" 
+                      min="10" 
+                      value={guestCount} 
+                      onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 0))}
+                      className="w-16 text-center font-black text-[#0B2240] text-lg bg-transparent focus:outline-none" 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setGuestCount(guestCount + 5)}
+                      className="w-10 h-10 rounded-xl bg-[#FAF8F5] flex items-center justify-center text-[#0B2240] hover:bg-[#EFECE6] transition-colors"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+
+                  {/* Preset guest pills */}
+                  {[25, 50, 80, 100, 200].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setGuestCount(preset)}
+                      className={`px-4 py-3 rounded-2xl font-bold text-xs transition-all border ${
+                        guestCount === preset 
+                          ? 'bg-[#0B2240] text-white border-[#0B2240] shadow-sm' 
+                          : 'bg-white text-[#0B2240] border-[#EFECE6] hover:border-[#DCD7CC]'
                       }`}
                     >
-                      <div>
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-bold text-[#0B2240] text-lg">{pkg.name}</h3>
-                          {selectedPackage?.id === pkg.id && (
-                            <span className="bg-[#607A41] text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                              <CheckCircle2 size={10} /> Selected
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[#607A41] font-black text-sm my-1">{parseFloat(pkg.pricePerPerson).toFixed(2)} USD <span className="font-medium text-slate-400 text-xs">/ guest</span></p>
-                        <p className="text-xs text-slate-600 mt-2 leading-relaxed">{pkg.description}</p>
-                      </div>
-
-                      {/* Display package features or sub-items if available */}
-                      {pkg.features && pkg.features.length > 0 && (
-                        <div className="mt-4 pt-3 border-t border-[#EFECE6]/60">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Includes:</p>
-                          <ul className="space-y-1">
-                            {pkg.features.map((feature: string, idx: number) => (
-                              <li key={idx} className="text-xs text-slate-600 flex items-center gap-1.5">
-                                <span className="w-1 h-1 rounded-full bg-[#607A41]"></span>
-                                {feature}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
+                      {preset}
+                    </button>
                   ))}
                 </div>
               </section>
 
-              {/* Step 2: Add-ons */}
+              {/* Step 3: Any upgrades? */}
               {addons.length > 0 && (
-                <section>
-                  <h2 className="text-xl font-serif font-bold text-[#0B2240] mb-4 flex items-center gap-2">
-                    <span className="bg-[#0B2240] text-white h-6 w-6 rounded-full flex items-center justify-center text-xs font-sans">2</span>
-                    Premium Upgrades (Optional)
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {addons.map((addon) => (
-                      <label key={addon.id} className="flex items-center space-x-3 p-4 bg-white border border-[#EFECE6] rounded-xl hover:bg-[#FAF8F5] cursor-pointer transition-colors shadow-sm">
-                        <input type="checkbox" checked={selectedAddons.includes(addon.id)} onChange={() => toggleAddon(addon.id)} className="w-4 h-4 text-[#0B2240] rounded border-slate-300 focus:ring-[#0B2240]" />
-                        <div className="flex-1">
-                          <p className="text-sm font-bold text-[#0B2240]">{addon.name}</p>
-                          <p className="text-[11px] text-[#607A41] font-bold">+{parseFloat(addon.pricePerPerson).toFixed(2)} USD / guest</p>
-                        </div>
-                      </label>
-                    ))}
+                <section className="space-y-3">
+                  <div>
+                    <h2 className="text-xl font-serif font-bold text-[#0B2240]">3. Any upgrades?</h2>
+                    <p className="text-xs text-slate-400 mt-0.5">Optional — priced per guest.</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2.5">
+                    {addons.map((addon) => {
+                      const isAdded = selectedAddons.includes(addon.id);
+                      return (
+                        <button
+                          key={addon.id}
+                          type="button"
+                          onClick={() => toggleAddon(addon.id)}
+                          className={`px-4 py-3 rounded-2xl text-xs font-bold transition-all border flex items-center gap-2 ${
+                            isAdded 
+                              ? 'bg-[#A35C3A] text-white border-[#A35C3A] shadow-sm' 
+                              : 'bg-white text-[#0B2240] border-[#EFECE6] hover:border-[#DCD7CC]'
+                          }`}
+                        >
+                          <span>{addon.name}</span>
+                          <span className={isAdded ? 'text-white/80' : 'text-[#607A41]'}>
+                            +${parseFloat(addon.pricePerPerson).toFixed(0)}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </section>
               )}
 
-              {/* Step 3: Event Details */}
-              <section>
-                <h2 className="text-xl font-serif font-bold text-[#0B2240] mb-4 flex items-center gap-2">
-                  <span className="bg-[#0B2240] text-white h-6 w-6 rounded-full flex items-center justify-center text-xs font-sans">3</span>
-                  Event Details
-                </h2>
+              {/* Step 4: Event Details Inputs */}
+              <section className="space-y-4 pt-4 border-t border-[#EFECE6]">
+                <h2 className="text-xl font-serif font-bold text-[#0B2240]">4. Event Logistics</h2>
                 <div className="bg-white p-6 rounded-2xl border border-[#EFECE6] shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-500 mb-1.5"><Users size={12}/> Guest Count (Min 10)</label>
-                    <input type="number" min="10" value={guestCount} onChange={(e) => setGuestCount(Number(e.target.value))} className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" />
+                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
+                      <Calendar size={12}/> Event Date
+                    </label>
+                    <input 
+                      type="date" 
+                      required 
+                      value={eventDetails.eventDate} 
+                      onChange={(e) => setEventDetails({...eventDetails, eventDate: e.target.value})} 
+                      className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
+                    />
                   </div>
                   <div>
-                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-500 mb-1.5"><Calendar size={12}/> Event Date</label>
-                    <input type="date" required value={eventDetails.eventDate} onChange={(e) => setEventDetails({...eventDetails, eventDate: e.target.value})} className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" />
+                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
+                      <User size={12}/> Full Name
+                    </label>
+                    <input 
+                      type="text" 
+                      required 
+                      placeholder="John Doe" 
+                      value={eventDetails.customerName} 
+                      onChange={(e) => setEventDetails({...eventDetails, customerName: e.target.value})} 
+                      className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
+                    />
                   </div>
                   <div>
-                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-500 mb-1.5"><User size={12}/> Full Name</label>
-                    <input type="text" required placeholder="John Doe" value={eventDetails.customerName} onChange={(e) => setEventDetails({...eventDetails, customerName: e.target.value})} className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" />
+                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
+                      <Phone size={12}/> Phone Number
+                    </label>
+                    <input 
+                      type="tel" 
+                      required 
+                      placeholder="+1 234 567 8900" 
+                      value={eventDetails.customerPhone} 
+                      onChange={(e) => setEventDetails({...eventDetails, customerPhone: e.target.value})} 
+                      className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
+                    />
                   </div>
                   <div>
-                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-500 mb-1.5"><Phone size={12}/> Phone Number</label>
-                    <input type="tel" required placeholder="+1 234 567 8900" value={eventDetails.customerPhone} onChange={(e) => setEventDetails({...eventDetails, customerPhone: e.target.value})} className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-500 mb-1.5"><MapPin size={12}/> Event Location</label>
-                    <input type="text" required placeholder="Full venue address" value={eventDetails.eventLocation} onChange={(e) => setEventDetails({...eventDetails, eventLocation: e.target.value})} className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" />
+                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
+                      <MapPin size={12}/> Event Location / Venue
+                    </label>
+                    <input 
+                      type="text" 
+                      required 
+                      placeholder="Full venue address" 
+                      value={eventDetails.eventLocation} 
+                      onChange={(e) => setEventDetails({...eventDetails, eventLocation: e.target.value})} 
+                      className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
+                    />
                   </div>
                 </div>
               </section>
 
             </div>
 
-            {/* Right Column: Checkout Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white p-6 rounded-2xl shadow-md border border-[#EFECE6] sticky top-36">
-                <h3 className="text-lg font-serif font-bold text-[#0B2240] border-b border-[#EFECE6] pb-4 mb-4">Quote Summary</h3>
-                
-                <div className="space-y-4 text-sm mb-6">
-                  <div className="flex justify-between text-slate-500">
-                    <span>Total Guests</span><span className="font-bold text-[#0B2240]">{guestCount}</span>
+            {/* Right Column: Sticky Quote Summary Card */}
+            <div className="lg:col-span-1 sticky top-28">
+              <div className="bg-white p-6 rounded-3xl shadow-md border border-[#EFECE6] space-y-6">
+                <div>
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Your estimate</span>
+                  <div className="text-3xl font-black text-[#0B2240] mt-1">
+                    ${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
-                  
+                  <span className="text-xs text-slate-500 font-medium">
+                    ${effectivePerPerson.toFixed(2)} per guest
+                  </span>
+                </div>
+
+                <div className="border-t border-[#EFECE6] pt-4 space-y-3 text-sm">
                   {selectedPackage ? (
-                    <div className="space-y-2 border-b border-dashed border-[#EFECE6] pb-4">
-                      <div className="flex justify-between font-medium">
-                        <span className="text-[#0B2240] font-bold">{selectedPackage.name}</span>
-                        <span className="text-[#0B2240]">{packageTotal.toFixed(2)} USD</span>
-                      </div>
-                      <p className="text-xs text-slate-500">{selectedPackage.description}</p>
+                    <div className="flex justify-between items-center font-medium">
+                      <span className="text-slate-600">{selectedPackage.name} × {guestCount}</span>
+                      <span className="font-bold text-[#0B2240]">${packageTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                     </div>
                   ) : (
-                    <p className="text-xs text-rose-500 italic">No package selected yet.</p>
+                    <p className="text-xs text-rose-500 italic">Please select a package.</p>
                   )}
 
-                  {selectedAddons.length > 0 && (
-                    <div className="border-b border-dashed border-[#EFECE6] pb-4 space-y-2">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Included Upgrades</p>
-                      {selectedAddons.map(id => {
-                        const addon = addons.find(a => a.id === id);
-                        if (!addon) return null;
-                        return (
-                          <div key={id} className="flex justify-between text-xs">
-                            <span className="text-slate-500">{addon.name}</span>
-                            <span className="font-medium text-[#0B2240]">{(parseFloat(addon.pricePerPerson) * guestCount).toFixed(2)} USD</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                  {selectedAddons.map(id => {
+                    const addon = addons.find(a => a.id === id);
+                    if (!addon) return null;
+                    const addonCost = parseFloat(addon.pricePerPerson) * guestCount;
+                    return (
+                      <div key={id} className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500">{addon.name} × {guestCount}</span>
+                        <span className="font-medium text-[#0B2240]">+${addonCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    );
+                  })}
                 </div>
 
-                <div className="border-t border-[#EFECE6] pt-4 mb-6">
-                  <div className="flex justify-between items-end">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Estimated Total</span>
-                    <span className="text-2xl font-black text-[#0B2240]">{grandTotal.toFixed(2)} <span className="text-sm font-bold text-slate-400">USD</span></span>
-                  </div>
+                <div className="border-t border-[#EFECE6] pt-4">
+                  <button 
+                    type="submit"
+                    disabled={!selectedPackage || !eventDetails.customerName || !eventDetails.eventDate || !eventDetails.eventLocation} 
+                    className="w-full py-4 bg-[#A35C3A] text-white rounded-2xl text-sm font-bold shadow-md hover:bg-[#8d4f31] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                  >
+                    Request booking
+                  </button>
+                  <p className="text-[11px] text-center text-slate-400 mt-3 leading-relaxed">
+                    No payment now. Delivery and staff quoted after we confirm.
+                  </p>
                 </div>
-
-                <button 
-                  onClick={handleSubmitBooking} 
-                  disabled={!selectedPackage || !eventDetails.customerName || !eventDetails.eventDate || !eventDetails.eventLocation} 
-                  className="w-full py-3.5 bg-[#0B2240] text-white rounded-xl text-sm font-bold shadow-md hover:bg-[#15345b] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
-                >
-                  Confirm Event Booking
-                </button>
               </div>
             </div>
-          </div>
+
+          </form>
         )}
       </main>
     </div>
