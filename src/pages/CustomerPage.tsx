@@ -26,10 +26,16 @@ export const CustomerPage: React.FC = () => {
         setLoading(true);
         const [pkgRes, addonRes] = await Promise.all([
           api.get('/packages'),
-          api.get('/packages/addons') // Adjust if your addon route is different
+          api.get('/packages/addons')
         ]);
-        setPackages(pkgRes.data);
-        setAddons(addonRes.data);
+        
+        // 🛡️ Bulletproof array extraction safeguarding against object wrappers
+        const pkgData = pkgRes.data;
+        setPackages(Array.isArray(pkgData) ? pkgData : (pkgData?.data && Array.isArray(pkgData.data) ? pkgData.data : []));
+
+        const addonData = addonRes.data;
+        setAddons(Array.isArray(addonData) ? addonData : (addonData?.data && Array.isArray(addonData.data) ? addonData.data : []));
+
       } catch (err: any) {
         console.error(err);
         setError('Unable to load catering packages.');
