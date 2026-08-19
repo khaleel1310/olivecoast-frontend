@@ -46,55 +46,67 @@ export const OwnerDashboard: React.FC = () => {
   const [editImgUrl, setEditImgUrl] = useState("");
   const [uploadingEdit, setUploadingEdit] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      const storedToken = localStorage.getItem("token");
-      const config = {
-        headers: {
-          Authorization: `Bearer ${storedToken}`,
-        },
-      };
+ const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-      // Fetching independently so a failure in Orders doesn't block the Menu visibility
-      const [ordersRes, menuRes] = await Promise.allSettled([
-        api.get("/orders", config),
-        api.get("/menu", config), // Pass config to both for production consistency
-      ]);
+const fetchData = async () => {
+  try {
+    const storedToken = localStorage.getItem("token");
 
-      // Handle Orders Response
-      if (ordersRes.status === "fulfilled") {
-        setOrders(ordersRes.value.data);
-      } else {
-        console.error("Order stream failed:", ordersRes.reason);
-      }
-
-      // Handle Menu Response
-      if (menuRes.status === "fulfilled") {
-        const rawMenuData = menuRes.value.data;
-        
-        // Defensive check: handle both direct arrays and nested { data: [] } wrappers
-        const menuArray = Array.isArray(rawMenuData) 
-          ? rawMenuData 
-          : (rawMenuData?.data && Array.isArray(rawMenuData.data)) 
-            ? rawMenuData.data 
-            : [];
-
-        setCategories(menuArray);
-      } else {
-        console.error("Menu stream failed:", menuRes.reason);
-      }
-    } catch (err) {
-      console.error("Sync failed:", err);
-    } finally {
+    // Guard Clause: Don't attempt protected routes if no token exists yet
+    if (!storedToken) {
+      console.warn("No auth token in localStorage. Skipping order stream.");
       setLoading(false);
+      return;
     }
-  };
 
-  useEffect(() => {
-    fetchData();
-    const intervalId = setInterval(fetchData, 30000);
-    return () => clearInterval(intervalId);
-  }, []);
+    const config = {
+      headers: {
+        Authorization: `Bearer ${storedToken}`,
+      },
+    };
+
+    // Fetch both endpoints independently
+    const [ordersRes, menuRes] = await Promise.allSettled([
+      api.get("/orders", config),
+      api.get("/menu", config),
+    ]);
+
+    // 1. Process Orders Response
+    if (ordersRes.status === "fulfilled") {
+      setOrders(ordersRes.value.data);
+    } else {
+      console.error("Order fetch failed:", ordersRes.reason);
+      // Handles token expiration/rejection on mobile Safari
+      if (ordersRes.reason?.response?.status === 401) {
+        console.warn("Unauthorized on iOS Safari. Token may be expired.");
+      }
+    }
+
+    // 2. Process Menu Response
+    if (menuRes.status === "fulfilled") {
+      const rawMenuData = menuRes.value.data;
+      const menuArray = Array.isArray(rawMenuData) 
+        ? rawMenuData 
+        : (rawMenuData?.data && Array.isArray(rawMenuData.data)) 
+          ? rawMenuData.data 
+          : [];
+
+      setCategories(menuArray);
+    } else {
+      console.error("Menu fetch failed:", menuRes.reason);
+    }
+  } catch (err) {
+    console.error("Sync failed:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchData();
+  const intervalId = setInterval(fetchData, 30000);
+  return () => clearInterval(intervalId);
+}, [isLoggedIn]); // Re-run automatically as soon as auth state changes!
 
   const pendingCount = orders.filter((o) => o.status === "PENDING").length;
   const doneCount = orders.filter((o) => o.status === "COMPLETED").length;
