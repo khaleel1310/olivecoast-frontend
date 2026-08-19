@@ -1,6 +1,6 @@
 // 📁 frontend/src/pages/CustomerPage.tsx
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, Loader2, Calendar, Users, MapPin, Phone, User } from 'lucide-react';
+import { AlertCircle, Loader2, Calendar, Users, MapPin, Phone, User, CheckCircle2 } from 'lucide-react';
 import { api } from '../api/client';
 
 export const CustomerPage: React.FC = () => {
@@ -29,7 +29,6 @@ export const CustomerPage: React.FC = () => {
           api.get('/packages/addons')
         ]);
         
-        // 🛡️ Bulletproof array extraction safeguarding against object wrappers
         const pkgData = pkgRes.data;
         setPackages(Array.isArray(pkgData) ? pkgData : (pkgData?.data && Array.isArray(pkgData.data) ? pkgData.data : []));
 
@@ -75,7 +74,6 @@ export const CustomerPage: React.FC = () => {
         addons: selectedAddons.map(id => ({ addonId: id }))
       });
       alert(`Booking Request Submitted! Reference Number: ${response.data.bookingNumber}`);
-      // Reset form
       setSelectedPackage(null);
       setSelectedAddons([]);
       setGuestCount(50);
@@ -88,7 +86,6 @@ export const CustomerPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF9F6] flex flex-col font-sans selection:bg-[#0B2240] selection:text-white">
-      {/* Premium Navigation Bar */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#EFECE6] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-28 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -124,7 +121,6 @@ export const CustomerPage: React.FC = () => {
 
         {!loading && !error && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column: Form & Selection */}
             <div className="lg:col-span-2 space-y-8">
               
               {/* Step 1: Packages */}
@@ -138,13 +134,37 @@ export const CustomerPage: React.FC = () => {
                     <div 
                       key={pkg.id} 
                       onClick={() => setSelectedPackage(pkg)}
-                      className={`p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm ${
-                        selectedPackage?.id === pkg.id ? 'border-[#0B2240] ring-4 ring-[#0B2240]/5' : 'border-[#EFECE6] hover:border-[#DCD7CC]'
+                      className={`p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${
+                        selectedPackage?.id === pkg.id ? 'border-[#0B2240] ring-4 ring-[#0B2240]/5 bg-[#FAF8F5]/50' : 'border-[#EFECE6] hover:border-[#DCD7CC]'
                       }`}
                     >
-                      <h3 className="font-bold text-[#0B2240] text-lg">{pkg.name}</h3>
-                      <p className="text-[#607A41] font-black text-sm my-1">{parseFloat(pkg.pricePerPerson).toFixed(2)} USD <span className="font-medium text-slate-400 text-xs">/ guest</span></p>
-                      <p className="text-xs text-slate-500 mt-2 line-clamp-3">{pkg.description}</p>
+                      <div>
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-bold text-[#0B2240] text-lg">{pkg.name}</h3>
+                          {selectedPackage?.id === pkg.id && (
+                            <span className="bg-[#607A41] text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <CheckCircle2 size={10} /> Selected
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[#607A41] font-black text-sm my-1">{parseFloat(pkg.pricePerPerson).toFixed(2)} USD <span className="font-medium text-slate-400 text-xs">/ guest</span></p>
+                        <p className="text-xs text-slate-600 mt-2 leading-relaxed">{pkg.description}</p>
+                      </div>
+
+                      {/* Display package features or sub-items if available */}
+                      {pkg.features && pkg.features.length > 0 && (
+                        <div className="mt-4 pt-3 border-t border-[#EFECE6]/60">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Includes:</p>
+                          <ul className="space-y-1">
+                            {pkg.features.map((feature: string, idx: number) => (
+                              <li key={idx} className="text-xs text-slate-600 flex items-center gap-1.5">
+                                <span className="w-1 h-1 rounded-full bg-[#607A41]"></span>
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -214,16 +234,19 @@ export const CustomerPage: React.FC = () => {
                   </div>
                   
                   {selectedPackage ? (
-                    <div className="flex justify-between font-medium">
-                      <span className="text-[#0B2240]">{selectedPackage.name}</span>
-                      <span className="text-[#0B2240]">{packageTotal.toFixed(2)} USD</span>
+                    <div className="space-y-2 border-b border-dashed border-[#EFECE6] pb-4">
+                      <div className="flex justify-between font-medium">
+                        <span className="text-[#0B2240] font-bold">{selectedPackage.name}</span>
+                        <span className="text-[#0B2240]">{packageTotal.toFixed(2)} USD</span>
+                      </div>
+                      <p className="text-xs text-slate-500">{selectedPackage.description}</p>
                     </div>
                   ) : (
                     <p className="text-xs text-rose-500 italic">No package selected yet.</p>
                   )}
 
                   {selectedAddons.length > 0 && (
-                    <div className="border-t border-dashed border-[#EFECE6] pt-4 space-y-2">
+                    <div className="border-b border-dashed border-[#EFECE6] pb-4 space-y-2">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Included Upgrades</p>
                       {selectedAddons.map(id => {
                         const addon = addons.find(a => a.id === id);
