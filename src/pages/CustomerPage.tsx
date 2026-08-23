@@ -1,32 +1,39 @@
 // 📁 frontend/src/pages/CustomerPage.tsx
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, Loader2, Calendar, MapPin, Phone, User, Check, Minus, Plus } from 'lucide-react';
+import { AlertCircle, Loader2, Calendar, MapPin, Phone, User, Check, Minus, Plus, Clock, FileText } from 'lucide-react';
 import { api } from '../api/client';
 
 export const CustomerPage: React.FC = () => {
   const [packages, setPackages] = useState<any[]>([]);
   const [addons, setAddons] = useState<any[]>([]);
+  const [drinks, setDrinks] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   // Booking Form State
   const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
   const [guestCount, setGuestCount] = useState<number>(80);
-  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+  
+  // Track quantities for addons and drinks: { [id]: quantity }
+  const [selectedAddons, setSelectedAddons] = useState<{ [id: string]: number }>({});
+  const [selectedDrinks, setSelectedDrinks] = useState<{ [id: string]: number }>({});
+
   const [eventDetails, setEventDetails] = useState({
     customerName: '',
     customerPhone: '',
     eventDate: '',
     eventLocation: '',
+    notes: '',
   });
 
   useEffect(() => {
     const fetchCateringData = async () => {
       try {
         setLoading(true);
-        const [pkgRes, addonRes] = await Promise.all([
+        const [pkgRes, addonRes, drinkRes] = await Promise.all([
           api.get('/packages'),
-          api.get('/packages/addons')
+          api.get('/packages/addons'),
+          api.get('/packages/drinks').catch(() => ({ data: [] })) // Fallback if drinks endpoint is still propagating
         ]);
         
         const pkgData = pkgRes.data;
@@ -40,6 +47,9 @@ export const CustomerPage: React.FC = () => {
         const addonData = addonRes.data;
         setAddons(Array.isArray(addonData) ? addonData : (addonData?.data && Array.isArray(addonData.data) ? addonData.data : []));
 
+        const drinkData = drinkRes.data;
+        setDrinks(Array.isArray(drinkData) ? drinkData : (drinkData?.data && Array.isArray(drinkData.data) ? drinkData.data : []));
+
       } catch (err: any) {
         console.error(err);
         setError('Unable to load catering packages.');
@@ -50,29 +60,65 @@ export const CustomerPage: React.FC = () => {
     fetchCateringData();
   }, []);
 
-  const toggleAddon = (id: string) => {
-    setSelectedAddons((prev) =>
-      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
-    );
+  // Addon quantity handlers
+  const updateAddonQty = (id: string, delta: number) => {
+    setSelectedAddons((prev) => {
+      const current = prev[id] || 0;
+      const nextVal = Math.max(0, current + delta);
+      if (nextVal === 0) {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      }
+      return { ...prev, [id]: nextVal };
+    });
+  };
+
+  // Drink quantity handlers
+  const updateDrinkQty = (id: string, delta: number) => {
+    setSelectedDrinks((prev) => {
+      const current = prev[id] || 0;
+      const nextVal = Math.max(0, current + delta);
+      if (nextVal === 0) {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      }
+      return { ...prev, [id]: nextVal };
+    });
   };
 
   // Calculations
   const packageUnitPrice = selectedPackage ? parseFloat(selectedPackage.pricePerPerson) : 0;
   const packageTotal = packageUnitPrice * guestCount;
   
-  const addonsTotal = selectedAddons.reduce((sum, addonId) => {
+  const addonsTotal = Object.entries(selectedAddons).reduce((sum, [addonId, qty]) => {
     const addon = addons.find((a) => a.id === addonId);
-    return sum + (addon ? parseFloat(addon.pricePerPerson) * guestCount : 0);
+    return sum + (addon ? parseFloat(addon.pricePerPerson) * qty : 0);
+  }, 0);
+
+  const drinksTotal = Object.entries(selectedDrinks).reduce((sum, [drinkId, qty]) => {
+    const drink = drinks.find((d) => d.id === drinkId);
+    return sum + (drink ? parseFloat(drink.pricePerPerson) * qty : 0);
   }, 0);
   
-  const grandTotal = packageTotal + addonsTotal;
+  const subtotal = packageTotal + addonsTotal + drinksTotal;
+  const tax = subtotal * 0.08; // 8% Tax
+  const grandTotal = subtotal + tax;
+  const downPayment = grandTotal * 0.25; // 25% Refundable Down Payment
   const effectivePerPerson = guestCount > 0 ? grandTotal / guestCount : 0;
 
   const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPackage) return alert('Please select a catering package first.');
+    if (guestCount < 20) return alert('Minimum guest count is 20.');
     
     try {
+      const formattedAddons = [
+        ...Object.entries(selectedAddons).map(([id, qty]) => ({ addonId: id, quantity: qty })),
+        ...Object.entries(selectedDrinks).map(([id, qty]) => ({ addonId: id, quantity: qty }))
+      ];
+
       const response = await api.post('/bookings', {
         packageId: selectedPackage.id,
         guestCount,
@@ -80,12 +126,14 @@ export const CustomerPage: React.FC = () => {
         eventLocation: eventDetails.eventLocation,
         customerName: eventDetails.customerName,
         customerPhone: eventDetails.customerPhone,
-        addons: selectedAddons.map(id => ({ addonId: id }))
+        notes: eventDetails.notes,
+        addons: formattedAddons
       });
       alert(`Booking Request Submitted! Reference Number: ${response.data.bookingNumber}`);
-      setSelectedAddons([]);
+      setSelectedAddons({});
+      setSelectedDrinks({});
       setGuestCount(80);
-      setEventDetails({ customerName: '', customerPhone: '', eventDate: '', eventLocation: '' });
+      setEventDetails({ customerName: '', customerPhone: '', eventDate: '', eventLocation: '', notes: '' });
     } catch (err) {
       console.error(err);
       alert('Failed to submit booking request. Please check your details.');
@@ -137,6 +185,10 @@ export const CustomerPage: React.FC = () => {
               <span className="text-[10px] font-sans font-bold tracking-[0.2em] text-[#607A41] uppercase block mt-0.5">Premium Event Catering</span>
             </div>
           </div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#607A41] bg-[#FAF8F5] px-3 py-1.5 rounded-full border border-[#EFECE6]">
+            <Clock size={14} />
+            <span>Kitchen Operating 24/7</span>
+          </div>
         </div>
       </header>
 
@@ -165,7 +217,7 @@ export const CustomerPage: React.FC = () => {
               <section className="space-y-4">
                 <h2 className="text-xl font-serif font-bold text-[#0B2240]">1. Pick a package</h2>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {packages.map((pkg) => {
                     const isSelected = selectedPackage?.id === pkg.id;
                     return (
@@ -182,11 +234,11 @@ export const CustomerPage: React.FC = () => {
                           </div>
                         )}
                         <div>
-                          <h3 className="font-bold text-[#0B2240] text-lg">{pkg.name}</h3>
+                          <h3 className="font-bold text-[#0B2240] text-base">{pkg.name}</h3>
                           <p className="text-xs text-slate-500 mt-1 line-clamp-2">{pkg.description}</p>
                         </div>
                         <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
-                          <span className="font-black text-[#0B2240] text-lg">${parseFloat(pkg.pricePerPerson).toFixed(2)}</span>
+                          <span className="font-black text-[#0B2240] text-base">${parseFloat(pkg.pricePerPerson).toFixed(2)}</span>
                           <span className="text-xs text-slate-400 font-medium"> /guest</span>
                         </div>
                       </div>
@@ -228,21 +280,26 @@ export const CustomerPage: React.FC = () => {
 
               {/* Step 2: How many guests? */}
               <section className="space-y-4">
-                <h2 className="text-xl font-serif font-bold text-[#0B2240]">2. How many guests?</h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-serif font-bold text-[#0B2240]">2. How many guests?</h2>
+                  <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                    Minimum 20 guests required
+                  </span>
+                </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="flex items-center bg-white border border-[#EFECE6] rounded-2xl p-1.5 shadow-sm">
                     <button 
                       type="button" 
-                      onClick={() => setGuestCount(Math.max(10, guestCount - 5))}
+                      onClick={() => setGuestCount(Math.max(20, guestCount - 5))}
                       className="w-10 h-10 rounded-xl bg-[#FAF8F5] flex items-center justify-center text-[#0B2240] hover:bg-[#EFECE6] transition-colors"
                     >
                       <Minus size={16} />
                     </button>
                     <input 
                       type="number" 
-                      min="10" 
+                      min="20" 
                       value={guestCount} 
-                      onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 0))}
+                      onChange={(e) => setGuestCount(Math.max(20, parseInt(e.target.value) || 20))}
                       className="w-16 text-center font-black text-[#0B2240] text-lg bg-transparent focus:outline-none" 
                     />
                     <button 
@@ -254,7 +311,7 @@ export const CustomerPage: React.FC = () => {
                     </button>
                   </div>
 
-                  {[25, 50, 80, 100, 200].map((preset) => (
+                  {[20, 50, 80, 100, 200].map((preset) => (
                     <button
                       key={preset}
                       type="button"
@@ -265,97 +322,163 @@ export const CustomerPage: React.FC = () => {
                           : 'bg-white text-[#0B2240] border-[#EFECE6] hover:border-[#DCD7CC]'
                       }`}
                     >
-                      {preset}
+                      {preset} guests
                     </button>
                   ))}
                 </div>
               </section>
 
-              {/* Step 3: Any upgrades? */}
-              {addons.length > 0 && (
-                <section className="space-y-3">
-                  <div>
-                    <h2 className="text-xl font-serif font-bold text-[#0B2240]">3. Any upgrades?</h2>
-                    <p className="text-xs text-slate-400 mt-0.5">Optional — priced per guest.</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2.5">
-                    {addons.map((addon) => {
-                      const isAdded = selectedAddons.includes(addon.id);
-                      return (
-                        <button
-                          key={addon.id}
-                          type="button"
-                          onClick={() => toggleAddon(addon.id)}
-                          className={`px-4 py-3 rounded-2xl text-xs font-bold transition-all border flex items-center gap-2 ${
-                            isAdded 
-                              ? 'bg-[#0B2240] text-white border-[#0B2240] shadow-sm' 
-                              : 'bg-white text-[#0B2240] border-[#EFECE6] hover:border-[#DCD7CC]'
-                          }`}
-                        >
-                          <span>{addon.name}</span>
-                          <span className={isAdded ? 'text-white/80' : 'text-[#607A41]'}>
-                            +${parseFloat(addon.pricePerPerson).toFixed(0)}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
+              {/* Step 3: Upgrades & Drinks */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Addons */}
+                {addons.length > 0 && (
+                  <section className="space-y-3">
+                    <div>
+                      <h2 className="text-lg font-serif font-bold text-[#0B2240]">3. Food Upgrades</h2>
+                      <p className="text-xs text-slate-400 mt-0.5">Priced per unit/guest.</p>
+                    </div>
+                    <div className="space-y-2">
+                      {addons.map((addon) => {
+                        const qty = selectedAddons[addon.id] || 0;
+                        return (
+                          <div key={addon.id} className="bg-white p-3 rounded-2xl border border-[#EFECE6] flex items-center justify-between shadow-sm">
+                            <div>
+                              <p className="text-xs font-bold text-[#0B2240]">{addon.name}</p>
+                              <span className="text-[11px] text-[#607A41] font-medium">+${parseFloat(addon.pricePerPerson).toFixed(2)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => updateAddonQty(addon.id, -1)}
+                                className="w-8 h-8 rounded-lg bg-[#FAF8F5] flex items-center justify-center text-[#0B2240] hover:bg-[#EFECE6]"
+                              >
+                                <Minus size={14} />
+                              </button>
+                              <span className="w-6 text-center text-xs font-bold">{qty}</span>
+                              <button
+                                type="button"
+                                onClick={() => updateAddonQty(addon.id, 1)}
+                                className="w-8 h-8 rounded-lg bg-[#FAF8F5] flex items-center justify-center text-[#0B2240] hover:bg-[#EFECE6]"
+                              >
+                                <Plus size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
 
-              {/* Step 4: Event Logistics */}
+                {/* Drinks */}
+                {drinks.length > 0 && (
+                  <section className="space-y-3">
+                    <div>
+                      <h2 className="text-lg font-serif font-bold text-[#0B2240]">4. Drinks & Beverages</h2>
+                      <p className="text-xs text-slate-400 mt-0.5">Optional beverage catalog.</p>
+                    </div>
+                    <div className="space-y-2">
+                      {drinks.map((drink) => {
+                        const qty = selectedDrinks[drink.id] || 0;
+                        return (
+                          <div key={drink.id} className="bg-white p-3 rounded-2xl border border-[#EFECE6] flex items-center justify-between shadow-sm">
+                            <div>
+                              <p className="text-xs font-bold text-[#0B2240]">{drink.name}</p>
+                              <span className="text-[11px] text-[#607A41] font-medium">+${parseFloat(drink.pricePerPerson).toFixed(2)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => updateDrinkQty(drink.id, -1)}
+                                className="w-8 h-8 rounded-lg bg-[#FAF8F5] flex items-center justify-center text-[#0B2240] hover:bg-[#EFECE6]"
+                              >
+                                <Minus size={14} />
+                              </button>
+                              <span className="w-6 text-center text-xs font-bold">{qty}</span>
+                              <button
+                                type="button"
+                                onClick={() => updateDrinkQty(drink.id, 1)}
+                                className="w-8 h-8 rounded-lg bg-[#FAF8F5] flex items-center justify-center text-[#0B2240] hover:bg-[#EFECE6]"
+                              >
+                                <Plus size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+              </div>
+
+              {/* Step 5: Event Logistics & Notes */}
               <section className="space-y-4 pt-4 border-t border-[#EFECE6]">
-                <h2 className="text-xl font-serif font-bold text-[#0B2240]">4. Event Logistics</h2>
-                <div className="bg-white p-6 rounded-2xl border border-[#EFECE6] shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
-                      <Calendar size={12}/> Event Date
-                    </label>
-                    <input 
-                      type="date" 
-                      required 
-                      value={eventDetails.eventDate} 
-                      onChange={(e) => setEventDetails({...eventDetails, eventDate: e.target.value})} 
-                      className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
-                    />
+                <h2 className="text-xl font-serif font-bold text-[#0B2240]">5. Event Logistics & Notes</h2>
+                <div className="bg-white p-6 rounded-2xl border border-[#EFECE6] shadow-sm space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
+                        <Calendar size={12}/> Event Date
+                      </label>
+                      <input 
+                        type="date" 
+                        required 
+                        value={eventDetails.eventDate} 
+                        onChange={(e) => setEventDetails({...eventDetails, eventDate: e.target.value})} 
+                        className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
+                        <User size={12}/> Full Name
+                      </label>
+                      <input 
+                        type="text" 
+                        required 
+                        placeholder="John Doe" 
+                        value={eventDetails.customerName} 
+                        onChange={(e) => setEventDetails({...eventDetails, customerName: e.target.value})} 
+                        className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
+                        <Phone size={12}/> Phone Number
+                      </label>
+                      <input 
+                        type="tel" 
+                        required 
+                        placeholder="+1 234 567 8900" 
+                        value={eventDetails.customerPhone} 
+                        onChange={(e) => setEventDetails({...eventDetails, customerPhone: e.target.value})} 
+                        className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
+                        <MapPin size={12}/> Event Location / Venue
+                      </label>
+                      <input 
+                        type="text" 
+                        required 
+                        placeholder="Full venue address" 
+                        value={eventDetails.eventLocation} 
+                        onChange={(e) => setEventDetails({...eventDetails, eventLocation: e.target.value})} 
+                        className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
+                      />
+                    </div>
                   </div>
+
                   <div>
                     <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
-                      <User size={12}/> Full Name
+                      <FileText size={12}/> Special Instructions / Dietary Notes
                     </label>
-                    <input 
-                      type="text" 
-                      required 
-                      placeholder="John Doe" 
-                      value={eventDetails.customerName} 
-                      onChange={(e) => setEventDetails({...eventDetails, customerName: e.target.value})} 
-                      className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
-                    />
-                  </div>
-                  <div>
-                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
-                      <Phone size={12}/> Phone Number
-                    </label>
-                    <input 
-                      type="tel" 
-                      required 
-                      placeholder="+1 234 567 8900" 
-                      value={eventDetails.customerPhone} 
-                      onChange={(e) => setEventDetails({...eventDetails, customerPhone: e.target.value})} 
-                      className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
-                    />
-                  </div>
-                  <div>
-                    <label className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 mb-1.5">
-                      <MapPin size={12}/> Event Location / Venue
-                    </label>
-                    <input 
-                      type="text" 
-                      required 
-                      placeholder="Full venue address" 
-                      value={eventDetails.eventLocation} 
-                      onChange={(e) => setEventDetails({...eventDetails, eventLocation: e.target.value})} 
-                      className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]" 
+                    <textarea 
+                      rows={3}
+                      placeholder="Any allergies, custom setups, or specific requests..."
+                      value={eventDetails.notes}
+                      onChange={(e) => setEventDetails({...eventDetails, notes: e.target.value})}
+                      className="w-full text-sm p-3 bg-[#FAF8F5] border border-[#EFECE6] rounded-xl focus:outline-none focus:border-[#0B2240]"
                     />
                   </div>
                 </div>
@@ -386,23 +509,51 @@ export const CustomerPage: React.FC = () => {
                     <p className="text-xs text-rose-500 italic">Please select a package.</p>
                   )}
 
-                  {selectedAddons.map(id => {
+                  {Object.entries(selectedAddons).map(([id, qty]) => {
                     const addon = addons.find(a => a.id === id);
                     if (!addon) return null;
-                    const addonCost = parseFloat(addon.pricePerPerson) * guestCount;
+                    const addonCost = parseFloat(addon.pricePerPerson) * qty;
                     return (
                       <div key={id} className="flex justify-between items-center text-xs">
-                        <span className="text-slate-500">{addon.name} × {guestCount}</span>
+                        <span className="text-slate-500">{addon.name} × {qty}</span>
                         <span className="font-medium text-[#0B2240]">+${addonCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    );
+                  })}
+
+                  {Object.entries(selectedDrinks).map(([id, qty]) => {
+                    const drink = drinks.find(d => d.id === id);
+                    if (!drink) return null;
+                    const drinkCost = parseFloat(drink.pricePerPerson) * qty;
+                    return (
+                      <div key={id} className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500">{drink.name} × {qty}</span>
+                        <span className="font-medium text-[#0B2240]">+${drinkCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                       </div>
                     );
                   })}
                 </div>
 
+                <div className="border-t border-[#EFECE6] pt-4 space-y-2 text-xs">
+                  <div className="flex justify-between text-slate-500">
+                    <span>Subtotal</span>
+                    <span>${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-500">
+                    <span>Estimated Tax (8%)</span>
+                    <span>${tax.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-[#0B2240] pt-2 border-t border-dashed border-[#EFECE6]">
+                    <span>Refundable Down Payment (25%)</span>
+                    <span>${downPayment.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 italic">Down payment is fully refundable if canceled within 72 hours of the event.</p>
+                </div>
+
                 <div className="border-t border-[#EFECE6] pt-4">
                   <button 
                     type="submit"
-                    disabled={!selectedPackage || !eventDetails.customerName || !eventDetails.eventDate || !eventDetails.eventLocation} 
+                    disabled={!selectedPackage || guestCount < 20 || !eventDetails.customerName || !eventDetails.eventDate || !eventDetails.eventLocation} 
                     className="w-full py-4 bg-[#0B2240] text-white rounded-2xl text-sm font-bold shadow-md hover:bg-[#15345b] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
                   >
                     Request booking
