@@ -1,6 +1,6 @@
 // 📁 frontend/src/pages/CustomerPage.tsx
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, Loader2, Calendar, MapPin, Phone, User, Check, Minus, Plus, Clock, FileText } from 'lucide-react';
+import { AlertCircle, Loader2, Calendar, MapPin, Phone, User, Check, Minus, Plus, Clock, FileText, DollarSign } from 'lucide-react';
 import { api } from '../api/client';
 
 export const CustomerPage: React.FC = () => {
@@ -13,6 +13,7 @@ export const CustomerPage: React.FC = () => {
   // Booking Form State
   const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
   const [guestCount, setGuestCount] = useState<number>(80);
+  const [tipPercentage, setTipPercentage] = useState<number>(0); // 0, 0.025, 0.05, 0.075
   
   // Track quantities for addons and drinks: { [id]: quantity }
   const [selectedAddons, setSelectedAddons] = useState<{ [id: string]: number }>({});
@@ -21,6 +22,7 @@ export const CustomerPage: React.FC = () => {
   const [eventDetails, setEventDetails] = useState({
     customerName: '',
     customerPhone: '',
+    customerEmail: '',
     eventDate: '',
     eventLocation: '',
     notes: '',
@@ -33,7 +35,7 @@ export const CustomerPage: React.FC = () => {
         const [pkgRes, addonRes, drinkRes] = await Promise.all([
           api.get('/packages'),
           api.get('/packages/addons'),
-          api.get('/packages/drinks').catch(() => ({ data: [] })) // Fallback if drinks endpoint is still propagating
+          api.get('/packages/drinks').catch(() => ({ data: [] }))
         ]);
         
         const pkgData = pkgRes.data;
@@ -88,7 +90,7 @@ export const CustomerPage: React.FC = () => {
     });
   };
 
-  // Calculations
+  // Financial Calculations matching backend logic
   const packageUnitPrice = selectedPackage ? parseFloat(selectedPackage.pricePerPerson) : 0;
   const packageTotal = packageUnitPrice * guestCount;
   
@@ -102,9 +104,15 @@ export const CustomerPage: React.FC = () => {
     return sum + (drink ? parseFloat(drink.pricePerPerson) * qty : 0);
   }, 0);
   
-  const subtotal = packageTotal + addonsTotal + drinksTotal;
-  const tax = subtotal * 0.08; // 8% Tax
-  const grandTotal = subtotal + tax;
+  const foodAndDrinksSubtotal = packageTotal + addonsTotal + drinksTotal;
+  const serviceFee = foodAndDrinksSubtotal * 0.10; // 10% Service Fee (excluding delivery)
+  const deliveryFee = 100.00; // Fixed delivery fee
+
+  const subtotalWithExtras = foodAndDrinksSubtotal + serviceFee + deliveryFee;
+  const tax = subtotalWithExtras * 0.08; // 8% Tax on food, drinks, service, and delivery
+  const tipAmount = subtotalWithExtras * tipPercentage; // Tip calculation
+  
+  const grandTotal = subtotalWithExtras + tax + tipAmount;
   const downPayment = grandTotal * 0.25; // 25% Refundable Down Payment
   const effectivePerPerson = guestCount > 0 ? grandTotal / guestCount : 0;
 
@@ -114,10 +122,8 @@ export const CustomerPage: React.FC = () => {
     if (guestCount < 20) return alert('Minimum guest count is 20.');
     
     try {
-      const formattedAddons = [
-        ...Object.entries(selectedAddons).map(([id, qty]) => ({ addonId: id, quantity: qty })),
-        ...Object.entries(selectedDrinks).map(([id, qty]) => ({ addonId: id, quantity: qty }))
-      ];
+      const formattedAddons = Object.entries(selectedAddons).map(([id, qty]) => ({ addonId: id, quantity: qty }));
+      const formattedDrinks = Object.entries(selectedDrinks).map(([id, qty]) => ({ drinkId: id, quantity: qty }));
 
       const response = await api.post('/bookings', {
         packageId: selectedPackage.id,
@@ -125,22 +131,26 @@ export const CustomerPage: React.FC = () => {
         eventDate: new Date(eventDetails.eventDate).toISOString(),
         eventLocation: eventDetails.eventLocation,
         customerName: eventDetails.customerName,
+        customerEmail: eventDetails.customerEmail || null,
         customerPhone: eventDetails.customerPhone,
         notes: eventDetails.notes,
-        addons: formattedAddons
+        addons: formattedAddons,
+        drinks: formattedDrinks,
+        tipPercentage
       });
-      alert(`Booking Request Submitted! Reference Number: ${response.data.bookingNumber}`);
-      setSelectedAddons({});
-      setSelectedDrinks({});
-      setGuestCount(80);
-      setEventDetails({ customerName: '', customerPhone: '', eventDate: '', eventLocation: '', notes: '' });
+
+      // Redirect to Stripe Checkout Session URL if provided
+      if (response.data.checkoutUrl) {
+        window.location.href = response.data.checkoutUrl;
+      } else {
+        alert(`Booking Request Submitted! Reference Number: ${response.data.bookingNumber}`);
+      }
     } catch (err) {
       console.error(err);
       alert('Failed to submit booking request. Please check your details.');
     }
   };
 
-  // Safely parse and flatten the categorized JSON from Supabase includedItems
   const getFormattedIncludedItems = (pkg: any) => {
     if (!pkg) return [];
     let items = pkg.includedItems || pkg.features || pkg.items;
@@ -246,7 +256,6 @@ export const CustomerPage: React.FC = () => {
                   })}
                 </div>
 
-                {/* Included Items Breakdown Box */}
                 {selectedPackage && (
                   <div className="p-6 bg-[#FAF8F5] rounded-2xl border border-[#EFECE6] transition-all space-y-4">
                     <p className="text-xs font-black text-[#0B2240] uppercase tracking-wider">
@@ -330,7 +339,6 @@ export const CustomerPage: React.FC = () => {
 
               {/* Step 3: Upgrades & Drinks */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Addons */}
                 {addons.length > 0 && (
                   <section className="space-y-3">
                     <div>
@@ -370,7 +378,6 @@ export const CustomerPage: React.FC = () => {
                   </section>
                 )}
 
-                {/* Drinks */}
                 {drinks.length > 0 && (
                   <section className="space-y-3">
                     <div>
@@ -534,32 +541,71 @@ export const CustomerPage: React.FC = () => {
                   })}
                 </div>
 
+                {/* Fees & Tips Breakdown */}
                 <div className="border-t border-[#EFECE6] pt-4 space-y-2 text-xs">
                   <div className="flex justify-between text-slate-500">
-                    <span>Subtotal</span>
-                    <span>${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    <span>Delivery Fee</span>
+                    <span>${deliveryFee.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-500">
+                    <span>Service Fee (10%)</span>
+                    <span>${serviceFee.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Estimated Tax (8%)</span>
                     <span>${tax.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="flex justify-between font-bold text-[#0B2240] pt-2 border-t border-dashed border-[#EFECE6]">
+
+                  {/* Tip Selector */}
+                  <div className="pt-2">
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1.5">Add a Tip</span>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {[
+                        { label: '0%', value: 0 },
+                        { label: '2.5%', value: 0.025 },
+                        { label: '5%', value: 0.05 },
+                        { label: '7.5%', value: 0.075 },
+                      ].map((tip) => (
+                        <button
+                          key={tip.label}
+                          type="button"
+                          onClick={() => setTipPercentage(tip.value)}
+                          className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all ${
+                            tipPercentage === tip.value
+                              ? 'bg-[#0B2240] text-white border-[#0B2240]'
+                              : 'bg-[#FAF8F5] text-slate-600 border-[#EFECE6] hover:border-[#DCD7CC]'
+                          }`}
+                        >
+                          {tip.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {tipAmount > 0 && (
+                    <div className="flex justify-between text-slate-500 pt-1">
+                      <span>Tip Amount</span>
+                      <span>${tipAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between font-bold text-[#0B2240] pt-3 border-t border-dashed border-[#EFECE6]">
                     <span>Refundable Down Payment (25%)</span>
                     <span>${downPayment.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <p className="text-[10px] text-slate-400 italic">Down payment is fully refundable if canceled within 72 hours of the event.</p>
+                  <p className="text-[10px] text-slate-400 italic">The down payment is fully refundable if canceled within 72 hours of placing the order.</p>
                 </div>
 
                 <div className="border-t border-[#EFECE6] pt-4">
                   <button 
                     type="submit"
-                    disabled={!selectedPackage || guestCount < 20 || !eventDetails.customerName || !eventDetails.eventDate || !eventDetails.eventLocation} 
-                    className="w-full py-4 bg-[#0B2240] text-white rounded-2xl text-sm font-bold shadow-md hover:bg-[#15345b] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                    disabled={!selectedPackage || guestCount < 20 || !eventDetails.customerName || !eventDetails.eventDate || !eventDetails.eventLocation || !eventDetails.customerPhone} 
+                    className="w-full py-4 bg-[#0B2240] text-white rounded-2xl text-sm font-bold shadow-md hover:bg-[#15345b] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2"
                   >
-                    Request booking
+                    <DollarSign size={16} /> Pay 25% Down Payment via Stripe
                   </button>
                   <p className="text-[11px] text-center text-slate-400 mt-3 leading-relaxed">
-                    No payment now. Delivery and staff quoted after we confirm.
+                    Secure checkout powered by Stripe. Remaining balance due on event day.
                   </p>
                 </div>
               </div>
