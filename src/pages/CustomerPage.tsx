@@ -529,7 +529,7 @@ export const CustomerPage: React.FC = () => {
               <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden bg-[#FAF8F5] border border-[#EFECE6]">
                 {/* Placeholder for Photo 2 */}
                 <div
-                  className="absolute inset-0 bg-cover bg-center flex items-center justify-center text-slate-400 text-xs italic"
+                  className="relative min-h-[300px] lg:min-h-[400px]"
                   style={{
                     backgroundImage: `url('/assets/photo-2-placeholder.jpg')`,
                   }}
