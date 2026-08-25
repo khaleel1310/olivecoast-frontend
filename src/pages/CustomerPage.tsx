@@ -10,7 +10,6 @@ import {
   Check,
   Minus,
   Plus,
-  Clock,
   FileText,
   DollarSign,
 } from "lucide-react";
