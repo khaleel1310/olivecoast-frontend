@@ -525,7 +525,7 @@ export const CustomerPage: React.FC = () => {
       </div>
     </section>
             {/* Kitchen Info / Hours Section with [photo 2] */}
-            <section className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white p-8 rounded-3xl border border-[#EFECE6] shadow-sm">
+            <section className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white rounded-3xl border border-[#EFECE6] shadow-sm">
 
   {/* Image */}
   <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden bg-[#FAF8F5] border border-[#EFECE6]">
