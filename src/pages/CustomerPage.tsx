@@ -218,32 +218,75 @@ export const CustomerPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Hero Banner Section with [photo 1] */}
-      <section className="relative h-[550px] w-full bg-slate-900 flex items-center justify-center text-center px-4 overflow-hidden">
-        {/* Placeholder for Photo 1 */}
-        <div className="absolute inset-0 opacity-40 bg-cover bg-center" style={{ backgroundImage: `url('/assets/photo-1-placeholder.jpg')` }}>
-          <img src="/assets/hero-mezz-lb_BKBuu.jpg" alt="Hero Image" className="w-full h-full object-cover" />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0B2240]/80 via-transparent to-black/40"></div>
-        
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <span className="text-xs font-bold tracking-[0.25em] text-[#DCD7CC] uppercase">Premium Event Catering</span>
-          <h2 className="text-5xl sm:text-6xl font-serif font-bold text-white tracking-wide">Olive Coast</h2>
-          <p className="text-sm sm:text-base text-slate-200 max-w-xl mx-auto font-light leading-relaxed">
-            Freshly prepared meals delivered straight to your table or counter. Clean, fast, and secure checkout.
-          </p>
-          <div className="pt-4 flex flex-wrap justify-center gap-4">
-            <a href="#packages" className="px-6 py-3 bg-white text-[#0B2240] rounded-xl text-xs font-bold uppercase tracking-wider shadow-md hover:bg-[#FAF8F5] transition-all">
-              Pick a Package
-            </a>
-            <div className="flex items-center gap-2 text-xs text-white/90 bg-white/10 backdrop-blur-md px-4 py-3 rounded-xl border border-white/20">
-              <Clock size={14} />
-              <span>Kitchen Operating 24/7</span>
-            </div>
-          </div>
-        </div>
-      </section>
+<section className="relative min-h-screen w-full overflow-hidden bg-[#0B2240]">
 
+  {/* Background Image */}
+  <div className="absolute inset-0">
+    <img
+      src="/assets/hero-mezze-lb_BKBuu.jpg"
+      alt="Mediterranean catering table"
+      className="w-full h-full object-cover"
+    />
+  </div>
+
+  {/* Cinematic Overlay */}
+  <div className="absolute inset-0 bg-black/25"></div>
+
+  {/* Darker bottom gradient */}
+  <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#0B170F]/90"></div>
+
+  {/* Subtle left-side darkening */}
+  <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent"></div>
+
+
+  
+
+  {/* =========================
+      HERO CONTENT
+  ========================= */}
+  <div className="relative z-10 min-h-[calc(100vh-100px)] max-w-[1180px] mx-auto px-6 lg:px-10 flex items-end pb-20 lg:pb-24">
+
+    <div className="max-w-[760px]">
+
+      {/* Main Heading */}
+      <h1 className="font-serif text-white text-5xl sm:text-6xl lg:text-[72px] leading-[0.98] tracking-[-0.025em] font-normal">
+        The Mediterranean table,
+        <br />
+        brought to your celebration
+      </h1>
+
+
+      {/* Description */}
+      <p className="mt-7 max-w-[650px] text-sm sm:text-base leading-7 text-white/85 font-light">
+        Chef-crafted collections built on olive oil, citrus, charcoal and
+        the generosity of a long table shared with people you love.
+      </p>
+
+
+      {/* CTA Buttons */}
+      <div className="mt-9 flex flex-wrap items-center gap-4">
+
+        <a
+          href="#estimate"
+          className="px-9 py-4 bg-[#D56A38] text-white text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-[#C45C2D] transition-colors"
+        >
+          Build Your Estimate
+        </a>
+
+        <a
+          href="#services"
+          className="px-9 py-4 border border-white/45 bg-black/10 text-white text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-white hover:text-[#0B2240] transition-all"
+        >
+          Explore Services
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {loading && (
           <div className="flex flex-col items-center justify-center py-32 space-y-3">
