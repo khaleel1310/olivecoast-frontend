@@ -536,7 +536,7 @@ export const CustomerPage: React.FC = () => {
                 >
                   {/* [photo 2: Chef prepping food] */}
                   <span>
-                    <img src="assets/Event.jpg" />
+                    <img src="assets/Event.png" />
                   </span>
                 </div>
               </div>
