@@ -222,7 +222,7 @@ export const CustomerPage: React.FC = () => {
       <section className="relative h-[550px] w-full bg-slate-900 flex items-center justify-center text-center px-4 overflow-hidden">
         {/* Placeholder for Photo 1 */}
         <div className="absolute inset-0 opacity-40 bg-cover bg-center" style={{ backgroundImage: `url('/assets/photo-1-placeholder.jpg')` }}>
-          {/* [photo 1] */}
+          <img src="/assets/hero-mezz-lb_BKBuu.jpg" alt="Hero Image" className="w-full h-full object-cover" />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-[#0B2240]/80 via-transparent to-black/40"></div>
         
@@ -267,7 +267,7 @@ export const CustomerPage: React.FC = () => {
                 {/* Placeholder for Photo 2 */}
                 <div className="absolute inset-0 bg-cover bg-center flex items-center justify-center text-slate-400 text-xs italic" style={{ backgroundImage: `url('/assets/photo-2-placeholder.jpg')` }}>
                   {/* [photo 2: Chef prepping food] */}
-                  <span>[photo 2]</span>
+                  <span><img src="assets/mezze-TdJfuK8F.jpg"/></span>
                 </div>
               </div>
               <div className="space-y-6">
@@ -298,7 +298,7 @@ export const CustomerPage: React.FC = () => {
             <section className="mb-16 rounded-3xl overflow-hidden bg-[#0A2015] text-white grid grid-cols-1 lg:grid-cols-2 shadow-md">
               <div className="relative min-h-[300px] bg-cover bg-center" style={{ backgroundImage: `url('/assets/photo-3-placeholder.jpg')` }}>
                 {/* [photo 3: Middle eastern spread] */}
-                <span className="absolute bottom-4 left-4 text-xs bg-black/60 px-3 py-1 rounded text-white/80">[photo 3]</span>
+                <span className="absolute bottom-4 left-4 text-xs bg-black/60 px-3 py-1 rounded text-white/80"><img src="assets/service-dropoff-BQOOqG3a.jpg"/></span>
               </div>
               <div className="p-8 sm:p-12 flex flex-col justify-center space-y-4">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A3B899]">Included in Every Collection</span>
