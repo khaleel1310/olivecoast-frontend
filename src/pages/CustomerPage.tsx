@@ -711,7 +711,7 @@ export const CustomerPage: React.FC = () => {
                     {/* STANDARD */}
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-widest text-[#607A41] mb-3">
-                        Standard
+                        Classic & Signature
                       </h3>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -768,68 +768,10 @@ export const CustomerPage: React.FC = () => {
                       </div>
                     </div>
 
-
-                    {/* LUXURY */}
-                    <div>
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-[#607A41] mb-3">
-                        Luxury
-                      </h3>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {packages
-                          .filter((pkg) => pkg.name === "Luxury Collection")
-                          .map((pkg) => {
-                            const isSelected = selectedPackage?.id === pkg.id;
-
-                            return (
-                              <div
-                                key={pkg.id}
-                                onClick={() => setSelectedPackage(pkg)}
-                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${isSelected
-                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
-                                    : "border-[#EFECE6] hover:border-[#DCD7CC]"
-                                  }`}
-                              >
-                                {/* Selected Check */}
-                                {isSelected && (
-                                  <div className="absolute top-3 right-3 w-6 h-6 bg-[#0B2240] text-white rounded-full flex items-center justify-center shadow-sm">
-                                    <Check size={14} strokeWidth={3} />
-                                  </div>
-                                )}
-
-                                {/* Package Info */}
-                                <div>
-                                  <h3 className="font-bold text-[#0B2240] text-base">
-                                    {pkg.name}
-                                  </h3>
-
-                                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                                    {pkg.description}
-                                  </p>
-                                </div>
-
-                                {/* Price */}
-                                <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
-                                  <span className="font-black text-[#0B2240] text-base">
-                                    ${parseFloat(pkg.pricePerPerson).toFixed(2)}
-                                  </span>
-
-                                  <span className="text-xs text-slate-400 font-medium">
-                                    {" "}
-                                    /guest
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </div>
-
-
                     {/* SPECIALTY */}
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-widest text-[#607A41] mb-3">
-                        Specialty
+                        Specialty & Premium
                       </h3>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -837,7 +779,8 @@ export const CustomerPage: React.FC = () => {
                           .filter(
                             (pkg) =>
                               pkg.name === "Vegetarian Collection" ||
-                              pkg.name === "Mediterranean Collection"
+                              pkg.name === "Mediterranean Collection"||
+                              pkg.name === "Luxury Collection"
                           )
                           .map((pkg) => {
                             const isSelected = selectedPackage?.id === pkg.id;
