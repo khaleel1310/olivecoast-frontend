@@ -458,10 +458,8 @@ export const CustomerPage: React.FC = () => {
             {/* Included in Every Collection Banner with [photo 3] */}
             <section className="mb-16 rounded-3xl overflow-hidden bg-[#0A2015] text-white grid grid-cols-1 lg:grid-cols-2 shadow-md">
                <div
-                  className="absolute inset-0 bg-cover bg-center flex items-center justify-center text-slate-400 text-xs italic"
-                  style={{
-                    backgroundImage: `url('/assets/Vigi-package.jpg')`,
-                  }}
+                  className="absolute inset-0 bg-cover bg-center flex items-center justify-center"
+                 
                 >
                   {/* [photo 2: Chef prepping food] */}
                   <span>
