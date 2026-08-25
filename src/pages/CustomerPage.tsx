@@ -478,10 +478,7 @@ export const CustomerPage: React.FC = () => {
                           <h3 className="text-sm font-bold text-[#0B2240]">
                             Fresh Ingredients
                           </h3>
-                          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                            Olive oil, herbs, and seasonal produce in every
-                            dish.
-                          </p>
+                          
                         </div>
                       </div>
 
