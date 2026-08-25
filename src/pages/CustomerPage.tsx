@@ -478,7 +478,7 @@ export const CustomerPage: React.FC = () => {
                           <h3 className="text-sm font-bold text-[#0B2240]">
                             Fresh Ingredients
                           </h3>
-                          
+
                         </div>
                       </div>
 
@@ -684,11 +684,10 @@ export const CustomerPage: React.FC = () => {
                         key={preset}
                         type="button"
                         onClick={() => setGuestCount(preset)}
-                        className={`px-4 py-3 rounded-2xl font-bold text-xs transition-all border ${
-                          guestCount === preset
+                        className={`px-4 py-3 rounded-2xl font-bold text-xs transition-all border ${guestCount === preset
                             ? "bg-[#0B2240] text-white border-[#0B2240] shadow-sm"
                             : "bg-white text-[#0B2240] border-[#EFECE6] hover:border-[#DCD7CC]"
-                        }`}
+                          }`}
                       >
                         {preset} guests
                       </button>
@@ -706,54 +705,189 @@ export const CustomerPage: React.FC = () => {
                     2. Pick a package
                   </h2>
 
-                  {/* Package Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {packages.map((pkg) => {
-                      const isSelected = selectedPackage?.id === pkg.id;
+                  {/* Package Categories */}
+                  <div className="space-y-8">
 
-                      return (
-                        <div
-                          key={pkg.id}
-                          onClick={() => setSelectedPackage(pkg)}
-                          className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${
-                            isSelected
-                              ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
-                              : "border-[#EFECE6] hover:border-[#DCD7CC]"
-                          }`}
-                        >
-                          {/* Selected Check */}
-                          {isSelected && (
-                            <div className="absolute top-3 right-3 w-6 h-6 bg-[#0B2240] text-white rounded-full flex items-center justify-center shadow-sm">
-                              <Check size={14} strokeWidth={3} />
-                            </div>
-                          )}
+                    {/* STANDARD */}
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-[#607A41] mb-3">
+                        Standard
+                      </h3>
 
-                          {/* Package Info */}
-                          <div>
-                            <h3 className="font-bold text-[#0B2240] text-base">
-                              {pkg.name}
-                            </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {packages
+                          .filter(
+                            (pkg) =>
+                              pkg.name === "Classic Collection" ||
+                              pkg.name === "Signature Collection"
+                          )
+                          .map((pkg) => {
+                            const isSelected = selectedPackage?.id === pkg.id;
 
-                            <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                              {pkg.description}
-                            </p>
-                          </div>
+                            return (
+                              <div
+                                key={pkg.id}
+                                onClick={() => setSelectedPackage(pkg)}
+                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${isSelected
+                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
+                                    : "border-[#EFECE6] hover:border-[#DCD7CC]"
+                                  }`}
+                              >
+                                {/* Selected Check */}
+                                {isSelected && (
+                                  <div className="absolute top-3 right-3 w-6 h-6 bg-[#0B2240] text-white rounded-full flex items-center justify-center shadow-sm">
+                                    <Check size={14} strokeWidth={3} />
+                                  </div>
+                                )}
 
-                          {/* Price */}
-                          <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
-                            <span className="font-black text-[#0B2240] text-base">
-                              ${parseFloat(pkg.pricePerPerson).toFixed(2)}
-                            </span>
+                                {/* Package Info */}
+                                <div>
+                                  <h3 className="font-bold text-[#0B2240] text-base">
+                                    {pkg.name}
+                                  </h3>
 
-                            <span className="text-xs text-slate-400 font-medium">
-                              {" "}
-                              /guest
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                                    {pkg.description}
+                                  </p>
+                                </div>
+
+                                {/* Price */}
+                                <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
+                                  <span className="font-black text-[#0B2240] text-base">
+                                    ${parseFloat(pkg.pricePerPerson).toFixed(2)}
+                                  </span>
+
+                                  <span className="text-xs text-slate-400 font-medium">
+                                    {" "}
+                                    /guest
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+
+
+                    {/* LUXURY */}
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-[#607A41] mb-3">
+                        Luxury
+                      </h3>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {packages
+                          .filter((pkg) => pkg.name === "Luxury Collection")
+                          .map((pkg) => {
+                            const isSelected = selectedPackage?.id === pkg.id;
+
+                            return (
+                              <div
+                                key={pkg.id}
+                                onClick={() => setSelectedPackage(pkg)}
+                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${isSelected
+                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
+                                    : "border-[#EFECE6] hover:border-[#DCD7CC]"
+                                  }`}
+                              >
+                                {/* Selected Check */}
+                                {isSelected && (
+                                  <div className="absolute top-3 right-3 w-6 h-6 bg-[#0B2240] text-white rounded-full flex items-center justify-center shadow-sm">
+                                    <Check size={14} strokeWidth={3} />
+                                  </div>
+                                )}
+
+                                {/* Package Info */}
+                                <div>
+                                  <h3 className="font-bold text-[#0B2240] text-base">
+                                    {pkg.name}
+                                  </h3>
+
+                                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                                    {pkg.description}
+                                  </p>
+                                </div>
+
+                                {/* Price */}
+                                <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
+                                  <span className="font-black text-[#0B2240] text-base">
+                                    ${parseFloat(pkg.pricePerPerson).toFixed(2)}
+                                  </span>
+
+                                  <span className="text-xs text-slate-400 font-medium">
+                                    {" "}
+                                    /guest
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+
+
+                    {/* SPECIALTY */}
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-[#607A41] mb-3">
+                        Specialty
+                      </h3>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {packages
+                          .filter(
+                            (pkg) =>
+                              pkg.name === "Vegetarian Collection" ||
+                              pkg.name === "Mediterranean Collection"
+                          )
+                          .map((pkg) => {
+                            const isSelected = selectedPackage?.id === pkg.id;
+
+                            return (
+                              <div
+                                key={pkg.id}
+                                onClick={() => setSelectedPackage(pkg)}
+                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${isSelected
+                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
+                                    : "border-[#EFECE6] hover:border-[#DCD7CC]"
+                                  }`}
+                              >
+                                {/* Selected Check */}
+                                {isSelected && (
+                                  <div className="absolute top-3 right-3 w-6 h-6 bg-[#0B2240] text-white rounded-full flex items-center justify-center shadow-sm">
+                                    <Check size={14} strokeWidth={3} />
+                                  </div>
+                                )}
+
+                                {/* Package Info */}
+                                <div>
+                                  <h3 className="font-bold text-[#0B2240] text-base">
+                                    {pkg.name}
+                                  </h3>
+
+                                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                                    {pkg.description}
+                                  </p>
+                                </div>
+
+                                {/* Price */}
+                                <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
+                                  <span className="font-black text-[#0B2240] text-base">
+                                    ${parseFloat(pkg.pricePerPerson).toFixed(2)}
+                                  </span>
+
+                                  <span className="text-xs text-slate-400 font-medium">
+                                    {" "}
+                                    /guest
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+
                   </div>
+
                   {selectedPackage && (
                     <div
                       ref={packageDetailsRef}
@@ -1125,15 +1259,13 @@ export const CustomerPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setIncludeDelivery(!includeDelivery)}
-                        className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                          includeDelivery ? "bg-[#607A41]" : "bg-[#CBD5C0]"
-                        }`}
+                        className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${includeDelivery ? "bg-[#607A41]" : "bg-[#CBD5C0]"
+                          }`}
                         aria-pressed={includeDelivery}
                       >
                         <span
-                          className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                            includeDelivery ? "translate-x-5" : "translate-x-0"
-                          }`}
+                          className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${includeDelivery ? "translate-x-5" : "translate-x-0"
+                            }`}
                         />
                       </button>
                     </div>
@@ -1152,17 +1284,15 @@ export const CustomerPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setIncludeServiceFee(!includeServiceFee)}
-                        className={`relative w-11 h-6 rounded-full transition-colors ${
-                          includeServiceFee ? "bg-[#607A41]" : "bg-[#CBD5C0]"
-                        }`}
+                        className={`relative w-11 h-6 rounded-full transition-colors ${includeServiceFee ? "bg-[#607A41]" : "bg-[#CBD5C0]"
+                          }`}
                         aria-pressed={includeServiceFee}
                       >
                         <span
-                          className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                            includeServiceFee
+                          className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${includeServiceFee
                               ? "translate-x-5"
                               : "translate-x-0"
-                          }`}
+                            }`}
                         />
                       </button>
                     </div>
@@ -1221,11 +1351,10 @@ export const CustomerPage: React.FC = () => {
                             key={tip.label}
                             type="button"
                             onClick={() => setTipPercentage(tip.value)}
-                            className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all ${
-                              tipPercentage === tip.value
+                            className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all ${tipPercentage === tip.value
                                 ? "bg-white text-[#0B2240] border-white"
                                 : "bg-[#1C3527] text-slate-300 border-[#2A4D39] hover:border-slate-400"
-                            }`}
+                              }`}
                           >
                             {tip.label}
                           </button>
