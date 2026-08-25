@@ -417,7 +417,7 @@ export const CustomerPage: React.FC = () => {
                 >
                   {/* [photo 2: Chef prepping food] */}
                   <span>
-                    <img src="assets/mezze-TdJfuK8F.jpg" />
+                    <img src="assets/event-gathering.jpg" />
                   </span>
                 </div>
               </div>
