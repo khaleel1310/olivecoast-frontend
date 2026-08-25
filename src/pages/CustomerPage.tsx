@@ -526,53 +526,58 @@ export const CustomerPage: React.FC = () => {
     </section>
             {/* Kitchen Info / Hours Section with [photo 2] */}
             <section className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white p-8 sm:p-12 rounded-3xl border border-[#EFECE6] shadow-sm">
-              <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden bg-[#FAF8F5] border border-[#EFECE6]">
-                {/* Placeholder for Photo 2 */}
-                <div
-                  className="relative min-h-[300px] lg:min-h-[400px]"
-                  style={{
-                    backgroundImage: `url('/assets/photo-2-placeholder.jpg')`,
-                  }}
-                >
-                  {/* [photo 2: Chef prepping food] */}
-                  <span>
-                    <img src="assets/Event.png" />
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-6">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C05621]">
-                  Kitchen Hours
-                </span>
-                <h3 className="text-3xl font-serif font-bold text-[#0B2240]">
-                  A kitchen built around your event day
-                </h3>
-                <div className="border-t border-[#EFECE6] divide-y divide-[#EFECE6] text-sm">
-                  <div className="py-3 flex justify-between font-medium text-slate-600">
-                    <span>Mon - Sat</span>
-                    <span className="font-bold text-[#0B2240]">
-                      11:00 AM - 10:00 PM
-                    </span>
-                  </div>
-                  <div className="py-3 flex justify-between font-medium text-slate-600">
-                    <span>Sunday</span>
-                    <span className="font-bold text-[#0B2240]">
-                      12:00 PM - 9:00 PM
-                    </span>
-                  </div>
-                  <div className="py-3 flex justify-between font-medium text-slate-600">
-                    <span>Minimum</span>
-                    <span className="font-bold text-[#0B2240]">
-                      20 guests required
-                    </span>
-                  </div>
-                  <div className="py-3 flex justify-between font-medium text-slate-600">
-                    <span>Delivery Fee</span>
-                    <span className="font-bold text-[#0B2240]">$100.00</span>
-                  </div>
-                </div>
-              </div>
-            </section>
+
+  {/* Image */}
+  <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden bg-[#FAF8F5] border border-[#EFECE6]">
+    <img
+      src="/assets/Event.png"
+      alt="Chef preparing food"
+      className="absolute inset-0 w-full h-full object-cover"
+    />
+  </div>
+
+  {/* Content */}
+  <div className="space-y-6">
+    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C05621]">
+      Kitchen Hours
+    </span>
+
+    <h3 className="text-3xl font-serif font-bold text-[#0B2240]">
+      A kitchen built around your event day
+    </h3>
+
+    <div className="border-t border-[#EFECE6] divide-y divide-[#EFECE6] text-sm">
+      <div className="py-3 flex justify-between font-medium text-slate-600">
+        <span>Mon - Sat</span>
+        <span className="font-bold text-[#0B2240]">
+          11:00 AM - 10:00 PM
+        </span>
+      </div>
+
+      <div className="py-3 flex justify-between font-medium text-slate-600">
+        <span>Sunday</span>
+        <span className="font-bold text-[#0B2240]">
+          12:00 PM - 9:00 PM
+        </span>
+      </div>
+
+      <div className="py-3 flex justify-between font-medium text-slate-600">
+        <span>Minimum</span>
+        <span className="font-bold text-[#0B2240]">
+          20 guests required
+        </span>
+      </div>
+
+      <div className="py-3 flex justify-between font-medium text-slate-600">
+        <span>Delivery Fee</span>
+        <span className="font-bold text-[#0B2240]">
+          $100.00
+        </span>
+      </div>
+    </div>
+  </div>
+
+</section>
 
             {/* Included in Every Collection Banner with [photo 3] */}
            <section className="mb-16 rounded-3xl overflow-hidden bg-[#0A2015] text-white grid grid-cols-1 lg:grid-cols-2 shadow-md">
