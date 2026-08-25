@@ -553,7 +553,7 @@ export const CustomerPage: React.FC = () => {
               </div>
 
               {/* Content */}
-              <div className="space-y-6 sm:p-12">
+              <div className="p-8 space-y-6 sm:p-12">
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C05621]">
                   Kitchen Hours
                 </span>
