@@ -685,8 +685,8 @@ export const CustomerPage: React.FC = () => {
                         type="button"
                         onClick={() => setGuestCount(preset)}
                         className={`px-4 py-3 rounded-2xl font-bold text-xs transition-all border ${guestCount === preset
-                            ? "bg-[#0B2240] text-white border-[#0B2240] shadow-sm"
-                            : "bg-white text-[#0B2240] border-[#EFECE6] hover:border-[#DCD7CC]"
+                          ? "bg-[#0B2240] text-white border-[#0B2240] shadow-sm"
+                          : "bg-white text-[#0B2240] border-[#EFECE6] hover:border-[#DCD7CC]"
                           }`}
                       >
                         {preset} guests
@@ -714,13 +714,11 @@ export const CustomerPage: React.FC = () => {
                         Classic & Signature
                       </h3>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+
+                        {/* Classic Collection */}
                         {packages
-                          .filter(
-                            (pkg) =>
-                              pkg.name === "Classic Collection" ||
-                              pkg.name === "Signature Collection"
-                          )
+                          .filter((pkg) => pkg.name === "Classic Collection")
                           .map((pkg) => {
                             const isSelected = selectedPackage?.id === pkg.id;
 
@@ -728,7 +726,67 @@ export const CustomerPage: React.FC = () => {
                               <div
                                 key={pkg.id}
                                 onClick={() => setSelectedPackage(pkg)}
-                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${isSelected
+                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between min-h-[220px] ${isSelected
+                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
+                                    : "border-[#EFECE6] hover:border-[#DCD7CC]"
+                                  }`}
+                              >
+                                {/* Selected Check */}
+                                {isSelected && (
+                                  <div className="absolute top-3 right-3 w-6 h-6 bg-[#0B2240] text-white rounded-full flex items-center justify-center shadow-sm">
+                                    <Check size={14} strokeWidth={3} />
+                                  </div>
+                                )}
+
+                                {/* Package Info */}
+                                <div>
+                                  <h3 className="font-bold text-[#0B2240] text-base">
+                                    {pkg.name}
+                                  </h3>
+
+                                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                                    {pkg.description}
+                                  </p>
+                                </div>
+
+                                {/* Price */}
+                                <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
+                                  <span className="font-black text-[#0B2240] text-base">
+                                    ${parseFloat(pkg.pricePerPerson).toFixed(2)}
+                                  </span>
+
+                                  <span className="text-xs text-slate-400 font-medium">
+                                    {" "}
+                                    /guest
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+
+                        {/* Middle Image */}
+                        <div className="relative overflow-hidden rounded-2xl min-h-[220px] lg:min-h-0">
+                          <img
+                            src="/assets/YOUR-IMAGE.jpg"
+                            alt="Mediterranean catering"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+
+                          {/* Subtle overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0B2240]/30 via-transparent to-transparent" />
+                        </div>
+
+                        {/* Signature Collection */}
+                        {packages
+                          .filter((pkg) => pkg.name === "Signature Collection")
+                          .map((pkg) => {
+                            const isSelected = selectedPackage?.id === pkg.id;
+
+                            return (
+                              <div
+                                key={pkg.id}
+                                onClick={() => setSelectedPackage(pkg)}
+                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between min-h-[220px] ${isSelected
                                     ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
                                     : "border-[#EFECE6] hover:border-[#DCD7CC]"
                                   }`}
@@ -779,7 +837,7 @@ export const CustomerPage: React.FC = () => {
                           .filter(
                             (pkg) =>
                               pkg.name === "Vegetarian Collection" ||
-                              pkg.name === "Mediterranean Collection"||
+                              pkg.name === "Mediterranean Collection" ||
                               pkg.name === "Luxury Collection"
                           )
                           .map((pkg) => {
@@ -790,8 +848,8 @@ export const CustomerPage: React.FC = () => {
                                 key={pkg.id}
                                 onClick={() => setSelectedPackage(pkg)}
                                 className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${isSelected
-                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
-                                    : "border-[#EFECE6] hover:border-[#DCD7CC]"
+                                  ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
+                                  : "border-[#EFECE6] hover:border-[#DCD7CC]"
                                   }`}
                               >
                                 {/* Selected Check */}
@@ -1233,8 +1291,8 @@ export const CustomerPage: React.FC = () => {
                       >
                         <span
                           className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${includeServiceFee
-                              ? "translate-x-5"
-                              : "translate-x-0"
+                            ? "translate-x-5"
+                            : "translate-x-0"
                             }`}
                         />
                       </button>
@@ -1295,8 +1353,8 @@ export const CustomerPage: React.FC = () => {
                             type="button"
                             onClick={() => setTipPercentage(tip.value)}
                             className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all ${tipPercentage === tip.value
-                                ? "bg-white text-[#0B2240] border-white"
-                                : "bg-[#1C3527] text-slate-300 border-[#2A4D39] hover:border-slate-400"
+                              ? "bg-white text-[#0B2240] border-white"
+                              : "bg-[#1C3527] text-slate-300 border-[#2A4D39] hover:border-slate-400"
                               }`}
                           >
                             {tip.label}
