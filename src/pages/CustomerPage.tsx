@@ -362,12 +362,11 @@ export const CustomerPage: React.FC = () => {
               the generosity of a long table shared with people you love.
             </p>
             {/* Working Hours */}
-            <div className="mt-5 text-white/80 text-xs sm:text-sm">
-              <span className="font-semibold text-white">Open daily</span>
+            <div className="mt-5 text-white/80 text-xs sm:text-sm">              
               <span className="mx-2 text-white/40">•</span>
               <span>Sun–Thu: 11 AM–10 PM</span>
               <span className="mx-2 text-white/40">•</span>
-              <span>Fri–Sat: 11 AM–12 AM</span>
+              <span>Fri–Sat: 11 AM–1 AM</span>
             </div>
 
             {/* CTA Buttons */}

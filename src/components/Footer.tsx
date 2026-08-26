@@ -33,7 +33,7 @@ export default function Footer() {
             Sun - Thu: <span className="text-white">11:00 AM - 10:00 PM</span>
           </p>
           <p className="text-sm text-gray-400 mt-1">
-            Fri - Sat: <span className="text-white">11:00 AM - 12:00 AM</span>
+            Fri - Sat: <span className="text-white">11:00 AM - 1:00 AM</span>
           </p>
         </div>
 
