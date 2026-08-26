@@ -767,7 +767,7 @@ export const CustomerPage: React.FC = () => {
                         {/* Middle Image */}
                         <div className="relative overflow-hidden rounded-2xl min-h-[220px] lg:min-h-0">
                           <img
-                            src="/assets/YOUR-IMAGE.jpg"
+                            src="/assets/terracotta-jars.jpg"
                             alt="Mediterranean catering"
                             className="absolute inset-0 w-full h-full object-cover"
                           />
