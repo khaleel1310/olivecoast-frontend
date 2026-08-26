@@ -254,6 +254,13 @@ export const CustomerPage: React.FC = () => {
   };
 
   const categorizedItems = getFormattedIncludedItems(selectedPackage);
+  const packageImages: Record<string, string> = {
+    "Classic Collection": "/assets/classic-collection.jpg",
+    "Signature Collection": "/assets/signature-collection.jpg",
+    "Vegetarian Collection": "/assets/vegetarian-collection.jpg",
+    "Mediterranean Collection": "/assets/mediterranean-collection.jpg",
+    "Luxury Collection": "/assets/luxury-collection.jpg",
+  };
 
   return (
     <div className="min-h-screen bg-[#FBF9F6] flex flex-col font-sans selection:bg-[#0B2240] selection:text-white">
@@ -362,7 +369,7 @@ export const CustomerPage: React.FC = () => {
               the generosity of a long table shared with people you love.
             </p>
             {/* Working Hours */}
-            <div className="mt-5 text-white/80 text-xs sm:text-sm">              
+            <div className="mt-5 text-white/80 text-xs sm:text-sm">
               <span className="mx-2 text-white/40">•</span>
               <span>Sun–Thu: 11 AM–10 PM</span>
               <span className="mx-2 text-white/40">•</span>
@@ -477,7 +484,6 @@ export const CustomerPage: React.FC = () => {
                           <h3 className="text-sm font-bold text-[#0B2240]">
                             Fresh Ingredients
                           </h3>
-
                         </div>
                       </div>
 
@@ -683,10 +689,11 @@ export const CustomerPage: React.FC = () => {
                         key={preset}
                         type="button"
                         onClick={() => setGuestCount(preset)}
-                        className={`px-4 py-3 rounded-2xl font-bold text-xs transition-all border ${guestCount === preset
-                          ? "bg-[#0B2240] text-white border-[#0B2240] shadow-sm"
-                          : "bg-white text-[#0B2240] border-[#EFECE6] hover:border-[#DCD7CC]"
-                          }`}
+                        className={`px-4 py-3 rounded-2xl font-bold text-xs transition-all border ${
+                          guestCount === preset
+                            ? "bg-[#0B2240] text-white border-[#0B2240] shadow-sm"
+                            : "bg-white text-[#0B2240] border-[#EFECE6] hover:border-[#DCD7CC]"
+                        }`}
                       >
                         {preset} guests
                       </button>
@@ -706,7 +713,6 @@ export const CustomerPage: React.FC = () => {
 
                   {/* Package Categories */}
                   <div className="space-y-8">
-
                     {/* STANDARD */}
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-widest text-[#607A41] mb-3">
@@ -714,7 +720,6 @@ export const CustomerPage: React.FC = () => {
                       </h3>
 
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
-
                         {/* Classic Collection */}
                         {packages
                           .filter((pkg) => pkg.name === "Classic Collection")
@@ -725,39 +730,61 @@ export const CustomerPage: React.FC = () => {
                               <div
                                 key={pkg.id}
                                 onClick={() => setSelectedPackage(pkg)}
-                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between min-h-[220px] ${isSelected
-                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
-                                    : "border-[#EFECE6] hover:border-[#DCD7CC]"
-                                  }`}
+                                className={`group relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex min-h-[220px] ${
+                                  isSelected
+                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10"
+                                    : "border-[#EFECE6] hover:border-[#DCD7CC] hover:shadow-md"
+                                }`}
                               >
-                                {/* Selected Check */}
-                                {isSelected && (
-                                  <div className="absolute top-3 right-3 w-6 h-6 bg-[#0B2240] text-white rounded-full flex items-center justify-center shadow-sm">
-                                    <Check size={14} strokeWidth={3} />
-                                  </div>
-                                )}
+                                {/* IMAGE */}
+                                <div className="relative w-[24%] min-w-[90px] overflow-hidden">
+                                  <img
+                                    src={packageImages[pkg.name]}
+                                    alt={pkg.name}
+                                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                  />
 
-                                {/* Package Info */}
-                                <div>
-                                  <h3 className="font-bold text-[#0B2240] text-base">
-                                    {pkg.name}
-                                  </h3>
+                                  {/* Image Overlay */}
+                                  <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-transparent to-black/20" />
 
-                                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                                    {pkg.description}
-                                  </p>
+                                  {/* Decorative Accent */}
+                                  <div className="absolute left-3 top-3 h-8 w-[2px] rounded-full bg-white/80" />
                                 </div>
 
-                                {/* Price */}
-                                <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
-                                  <span className="font-black text-[#0B2240] text-base">
-                                    ${parseFloat(pkg.pricePerPerson).toFixed(2)}
-                                  </span>
+                                {/* CONTENT */}
+                                <div className="relative flex flex-1 flex-col justify-between p-5">
+                                  {/* Selected Check */}
+                                  {isSelected && (
+                                    <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#0B2240] text-white shadow-sm">
+                                      <Check size={14} strokeWidth={3} />
+                                    </div>
+                                  )}
 
-                                  <span className="text-xs text-slate-400 font-medium">
-                                    {" "}
-                                    /guest
-                                  </span>
+                                  {/* Package Info */}
+                                  <div className={isSelected ? "pr-8" : ""}>
+                                    <h3 className="font-bold text-[#0B2240] text-base">
+                                      {pkg.name}
+                                    </h3>
+
+                                    <p className="text-xs text-slate-500 mt-1 line-clamp-3 leading-relaxed">
+                                      {pkg.description}
+                                    </p>
+                                  </div>
+
+                                  {/* Price */}
+                                  <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
+                                    <span className="font-black text-[#0B2240] text-base">
+                                      $
+                                      {parseFloat(pkg.pricePerPerson).toFixed(
+                                        2,
+                                      )}
+                                    </span>
+
+                                    <span className="text-xs text-slate-400 font-medium">
+                                      {" "}
+                                      /guest
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -771,7 +798,7 @@ export const CustomerPage: React.FC = () => {
                             className="absolute inset-0 w-full h-full object-cover"
                           />
 
-                          {/* Subtle overlay */}
+                          {/* Subtle Overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-[#0B2240]/30 via-transparent to-transparent" />
                         </div>
 
@@ -785,39 +812,61 @@ export const CustomerPage: React.FC = () => {
                               <div
                                 key={pkg.id}
                                 onClick={() => setSelectedPackage(pkg)}
-                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between min-h-[220px] ${isSelected
-                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
-                                    : "border-[#EFECE6] hover:border-[#DCD7CC]"
-                                  }`}
+                                className={`group relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex min-h-[220px] ${
+                                  isSelected
+                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10"
+                                    : "border-[#EFECE6] hover:border-[#DCD7CC] hover:shadow-md"
+                                }`}
                               >
-                                {/* Selected Check */}
-                                {isSelected && (
-                                  <div className="absolute top-3 right-3 w-6 h-6 bg-[#0B2240] text-white rounded-full flex items-center justify-center shadow-sm">
-                                    <Check size={14} strokeWidth={3} />
-                                  </div>
-                                )}
+                                {/* IMAGE */}
+                                <div className="relative w-[24%] min-w-[90px] overflow-hidden">
+                                  <img
+                                    src={packageImages[pkg.name]}
+                                    alt={pkg.name}
+                                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                  />
 
-                                {/* Package Info */}
-                                <div>
-                                  <h3 className="font-bold text-[#0B2240] text-base">
-                                    {pkg.name}
-                                  </h3>
+                                  {/* Image Overlay */}
+                                  <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-transparent to-black/20" />
 
-                                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                                    {pkg.description}
-                                  </p>
+                                  {/* Decorative Accent */}
+                                  <div className="absolute left-3 top-3 h-8 w-[2px] rounded-full bg-white/80" />
                                 </div>
 
-                                {/* Price */}
-                                <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
-                                  <span className="font-black text-[#0B2240] text-base">
-                                    ${parseFloat(pkg.pricePerPerson).toFixed(2)}
-                                  </span>
+                                {/* CONTENT */}
+                                <div className="relative flex flex-1 flex-col justify-between p-5">
+                                  {/* Selected Check */}
+                                  {isSelected && (
+                                    <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#0B2240] text-white shadow-sm">
+                                      <Check size={14} strokeWidth={3} />
+                                    </div>
+                                  )}
 
-                                  <span className="text-xs text-slate-400 font-medium">
-                                    {" "}
-                                    /guest
-                                  </span>
+                                  {/* Package Info */}
+                                  <div className={isSelected ? "pr-8" : ""}>
+                                    <h3 className="font-bold text-[#0B2240] text-base">
+                                      {pkg.name}
+                                    </h3>
+
+                                    <p className="text-xs text-slate-500 mt-1 line-clamp-3 leading-relaxed">
+                                      {pkg.description}
+                                    </p>
+                                  </div>
+
+                                  {/* Price */}
+                                  <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
+                                    <span className="font-black text-[#0B2240] text-base">
+                                      $
+                                      {parseFloat(pkg.pricePerPerson).toFixed(
+                                        2,
+                                      )}
+                                    </span>
+
+                                    <span className="text-xs text-slate-400 font-medium">
+                                      {" "}
+                                      /guest
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -837,7 +886,7 @@ export const CustomerPage: React.FC = () => {
                             (pkg) =>
                               pkg.name === "Vegetarian Collection" ||
                               pkg.name === "Mediterranean Collection" ||
-                              pkg.name === "Luxury Collection"
+                              pkg.name === "Luxury Collection",
                           )
                           .map((pkg) => {
                             const isSelected = selectedPackage?.id === pkg.id;
@@ -846,46 +895,67 @@ export const CustomerPage: React.FC = () => {
                               <div
                                 key={pkg.id}
                                 onClick={() => setSelectedPackage(pkg)}
-                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex flex-col justify-between ${isSelected
-                                  ? "border-[#0B2240] ring-2 ring-[#0B2240]/10 bg-white"
-                                  : "border-[#EFECE6] hover:border-[#DCD7CC]"
-                                  }`}
+                                className={`group relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex min-h-[220px] ${
+                                  isSelected
+                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10"
+                                    : "border-[#EFECE6] hover:border-[#DCD7CC] hover:shadow-md"
+                                }`}
                               >
-                                {/* Selected Check */}
-                                {isSelected && (
-                                  <div className="absolute top-3 right-3 w-6 h-6 bg-[#0B2240] text-white rounded-full flex items-center justify-center shadow-sm">
-                                    <Check size={14} strokeWidth={3} />
-                                  </div>
-                                )}
+                                {/* IMAGE */}
+                                <div className="relative w-[24%] min-w-[90px] overflow-hidden">
+                                  <img
+                                    src={packageImages[pkg.name]}
+                                    alt={pkg.name}
+                                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                  />
 
-                                {/* Package Info */}
-                                <div>
-                                  <h3 className="font-bold text-[#0B2240] text-base">
-                                    {pkg.name}
-                                  </h3>
+                                  {/* Image Overlay */}
+                                  <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-transparent to-black/20" />
 
-                                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                                    {pkg.description}
-                                  </p>
+                                  {/* Decorative Accent */}
+                                  <div className="absolute left-3 top-3 h-8 w-[2px] rounded-full bg-white/80" />
                                 </div>
 
-                                {/* Price */}
-                                <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
-                                  <span className="font-black text-[#0B2240] text-base">
-                                    ${parseFloat(pkg.pricePerPerson).toFixed(2)}
-                                  </span>
+                                {/* CONTENT */}
+                                <div className="relative flex flex-1 flex-col justify-between p-5">
+                                  {/* Selected Check */}
+                                  {isSelected && (
+                                    <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#0B2240] text-white shadow-sm">
+                                      <Check size={14} strokeWidth={3} />
+                                    </div>
+                                  )}
 
-                                  <span className="text-xs text-slate-400 font-medium">
-                                    {" "}
-                                    /guest
-                                  </span>
+                                  {/* Package Info */}
+                                  <div className={isSelected ? "pr-8" : ""}>
+                                    <h3 className="font-bold text-[#0B2240] text-base">
+                                      {pkg.name}
+                                    </h3>
+
+                                    <p className="text-xs text-slate-500 mt-1 line-clamp-3 leading-relaxed">
+                                      {pkg.description}
+                                    </p>
+                                  </div>
+
+                                  {/* Price */}
+                                  <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
+                                    <span className="font-black text-[#0B2240] text-base">
+                                      $
+                                      {parseFloat(pkg.pricePerPerson).toFixed(
+                                        2,
+                                      )}
+                                    </span>
+
+                                    <span className="text-xs text-slate-400 font-medium">
+                                      {" "}
+                                      /guest
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             );
                           })}
                       </div>
                     </div>
-
                   </div>
 
                   {selectedPackage && (
@@ -1259,13 +1329,15 @@ export const CustomerPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setIncludeDelivery(!includeDelivery)}
-                        className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${includeDelivery ? "bg-[#607A41]" : "bg-[#CBD5C0]"
-                          }`}
+                        className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
+                          includeDelivery ? "bg-[#607A41]" : "bg-[#CBD5C0]"
+                        }`}
                         aria-pressed={includeDelivery}
                       >
                         <span
-                          className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${includeDelivery ? "translate-x-5" : "translate-x-0"
-                            }`}
+                          className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                            includeDelivery ? "translate-x-5" : "translate-x-0"
+                          }`}
                         />
                       </button>
                     </div>
@@ -1284,15 +1356,17 @@ export const CustomerPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setIncludeServiceFee(!includeServiceFee)}
-                        className={`relative w-11 h-6 rounded-full transition-colors ${includeServiceFee ? "bg-[#607A41]" : "bg-[#CBD5C0]"
-                          }`}
+                        className={`relative w-11 h-6 rounded-full transition-colors ${
+                          includeServiceFee ? "bg-[#607A41]" : "bg-[#CBD5C0]"
+                        }`}
                         aria-pressed={includeServiceFee}
                       >
                         <span
-                          className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${includeServiceFee
-                            ? "translate-x-5"
-                            : "translate-x-0"
-                            }`}
+                          className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                            includeServiceFee
+                              ? "translate-x-5"
+                              : "translate-x-0"
+                          }`}
                         />
                       </button>
                     </div>
@@ -1351,10 +1425,11 @@ export const CustomerPage: React.FC = () => {
                             key={tip.label}
                             type="button"
                             onClick={() => setTipPercentage(tip.value)}
-                            className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all ${tipPercentage === tip.value
-                              ? "bg-white text-[#0B2240] border-white"
-                              : "bg-[#1C3527] text-slate-300 border-[#2A4D39] hover:border-slate-400"
-                              }`}
+                            className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all ${
+                              tipPercentage === tip.value
+                                ? "bg-white text-[#0B2240] border-white"
+                                : "bg-[#1C3527] text-slate-300 border-[#2A4D39] hover:border-slate-400"
+                            }`}
                           >
                             {tip.label}
                           </button>
