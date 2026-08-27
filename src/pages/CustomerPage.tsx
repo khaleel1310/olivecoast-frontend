@@ -12,9 +12,6 @@ import {
   Plus,
   FileText,
   DollarSign,
-  Leaf,
-  Users,
-  Clock,
 } from "lucide-react";
 import { api } from "../api/client";
 import { Hero } from "../components/Hero";
