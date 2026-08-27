@@ -548,7 +548,7 @@ export const CustomerPage: React.FC = () => {
               {/* Image */}
               <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden bg-[#FAF8F5] border border-[#EFECE6]">
                 <img
-                  src="/assets/Event.png"
+                  src="/assets/Event.jpg"
                   alt="Chef preparing food"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
