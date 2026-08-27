@@ -19,6 +19,7 @@ import { AboutUs } from "../components/AboutUs";
 import { Header } from "../components/Header";
 import { KitchenInfo } from "../components/KitchenInfo";
 import { PackageCard } from "../components/PackageCard";
+import { IncludedBanner } from "../components/IncludedBanner";
 
 export const CustomerPage: React.FC = () => {
   const [packages, setPackages] = useState<any[]>([]);
@@ -275,7 +276,8 @@ export const CustomerPage: React.FC = () => {
       {/* About us Section */}
       <AboutUs />
       <KitchenInfo />
-
+      <IncludedBanner />
+      
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {loading && (
           <div className="flex flex-col items-center justify-center py-32 space-y-3">
@@ -295,95 +297,6 @@ export const CustomerPage: React.FC = () => {
 
         {!loading && !error && (
           <>
-            {/* Kitchen Info / Hours Section with [photo 2] */}
-            <section className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white rounded-3xl border border-[#EFECE6] shadow-sm">
-              {/* Image */}
-              <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden bg-[#FAF8F5] border border-[#EFECE6]">
-                <img
-                  src="/assets/Event.jpg"
-                  alt="Chef preparing food"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Content */}
-              <div className="p-8 space-y-6 sm:p-12">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C05621]">
-                  Kitchen Hours
-                </span>
-
-                <h3 className="text-3xl font-serif font-bold text-[#0B2240]">
-                  A kitchen built around your event day
-                </h3>
-
-                <div className="border-t border-[#EFECE6] divide-y divide-[#EFECE6] text-sm">
-                  <div className="py-3 flex justify-between font-medium text-slate-600">
-                    <span>Mon - Sat</span>
-                    <span className="font-bold text-[#0B2240]">
-                      11:00 AM - 10:00 PM
-                    </span>
-                  </div>
-
-                  <div className="py-3 flex justify-between font-medium text-slate-600">
-                    <span>Sunday</span>
-                    <span className="font-bold text-[#0B2240]">
-                      12:00 PM - 9:00 PM
-                    </span>
-                  </div>
-
-                  <div className="py-3 flex justify-between font-medium text-slate-600">
-                    <span>Minimum</span>
-                    <span className="font-bold text-[#0B2240]">
-                      20 guests required
-                    </span>
-                  </div>
-
-                  <div className="py-3 flex justify-between font-medium text-slate-600">
-                    <span>Delivery Fee</span>
-                    <span className="font-bold text-[#0B2240]">$100.00</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Included in Every Collection Banner with [photo 3] */}
-            <section className="mb-16 rounded-3xl overflow-hidden bg-[#0A2015] text-white grid grid-cols-1 lg:grid-cols-2 shadow-md">
-              {/* Image */}
-              <div className="relative min-h-[300px] lg:min-h-[400px]">
-                <img
-                  src="/assets/package-Vigi.jpg"
-                  alt="Vigi package"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Content */}
-              <div className="p-8 sm:p-12 flex flex-col justify-center space-y-4">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A3B899]">
-                  Included in Every Collection
-                </span>
-
-                <blockquote className="text-2xl sm:text-3xl font-serif italic text-white leading-relaxed">
-                  "Freshly prepared meals delivered straight to your table or
-                  counter."
-                </blockquote>
-
-                <p className="text-xs text-slate-300 leading-relaxed font-light">
-                  Clean, fast, and secure checkout. Secure checkout powered by
-                  Stripe. Remaining balance due on event day.
-                </p>
-
-                <div className="pt-2">
-                  <a
-                    href="#guests"
-                    className="inline-block px-6 py-3 bg-white text-[#0B2240] rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-100 transition-colors"
-                  >
-                    Build Your Event
-                  </a>
-                </div>
-              </div>
-            </section>
-
             <form
               onSubmit={handleSubmitBooking}
               className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start"
