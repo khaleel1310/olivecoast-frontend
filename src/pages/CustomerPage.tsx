@@ -453,7 +453,7 @@ export const CustomerPage: React.FC = () => {
                   </div>
                 </section>
                 {/* Step 2: Pick a package */}
-                // 📁 Inside your parent component
+                
                 <section id="packages" className="space-y-4 scroll-mt-28">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C05621]">
                     Step Two
