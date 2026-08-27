@@ -17,6 +17,11 @@ import {
   Clock,
 } from "lucide-react";
 import { api } from "../api/client";
+import { Hero } from "../components/Hero";
+import { AboutUs } from "../components/AboutUs";
+import { Header } from "../components/Header";
+import { KitchenInfo } from "../components/KitchenInfo";
+import { PackageCard } from "../components/PackageCard";
 
 export const CustomerPage: React.FC = () => {
   const [packages, setPackages] = useState<any[]>([]);
@@ -265,136 +270,14 @@ export const CustomerPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FBF9F6] flex flex-col font-sans selection:bg-[#0B2240] selection:text-white">
       {/* Brand Header with Nav Links */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#EFECE6] shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-14 w-14 rounded-xl overflow-hidden bg-[#FAF8F5] border border-[#EFECE6] p-1 flex items-center justify-center shrink-0">
-              <img
-                src="/assets/Olive_Coast_Logo.jpg"
-                alt="Logo"
-                className="h-full w-full object-contain scale-110"
-              />
-            </div>
+      <Header />
 
-            <div>
-              <h1 className="text-xl font-serif font-bold text-[#0B2240] tracking-wide leading-tight">
-                OLIVE COAST
-              </h1>
-              <span className="text-[10px] font-sans font-bold tracking-[0.2em] text-[#607A41] uppercase block mt-0.5">
-                Premium Event Catering
-              </span>
-            </div>
-          </div>
+      {/* Hero Section */}
+      <Hero />
 
-          {/* Navigation Links matching UI */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-[#0B2240]">
-            <a
-              href="#packages"
-              className="hover:text-[#607A41] transition-colors"
-            >
-              Packages
-            </a>
-            <a
-              href="#guests"
-              className="hover:text-[#607A41] transition-colors"
-            >
-              Guests
-            </a>
-            <a
-              href="#food-upgrades"
-              className="hover:text-[#607A41] transition-colors"
-            >
-              Food Upgrades
-            </a>
-            <a
-              href="#drinks"
-              className="hover:text-[#607A41] transition-colors"
-            >
-              Drinks & Beverages
-            </a>
-            <a
-              href="#logistics"
-              className="hover:text-[#607A41] transition-colors"
-            >
-              Event Logistics
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <a
-              href="tel:+18036161856"
-              className="flex items-center gap-2 text-xs font-bold text-white bg-[#0B2240] px-4 py-2 rounded-lg shadow-sm hover:bg-[#15345b] transition-colors"
-            >
-              <Phone size={14} />
-              <span>+1 (803) 616-1856</span>
-            </a>
-          </div>
-        </div>
-      </header>
-
-      <section className="relative min-h-screen w-full overflow-hidden bg-[#0B2240]">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img
-            src="/assets/service-weddings-BG8t11UT.jpg"
-            alt="Mediterranean catering table"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Cinematic Overlay */}
-        <div className="absolute inset-0 bg-black/25"></div>
-
-        {/* Darker bottom gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-[#0B170F]/90"></div>
-
-        {/* Subtle left-side darkening */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent"></div>
-
-        {/* =========================
-      HERO CONTENT
-  ========================= */}
-        <div className="relative z-10 min-h-[calc(100vh-100px)] max-w-[1180px] mx-auto px-6 lg:px-10 flex items-end pb-20 lg:pb-24">
-          <div className="max-w-[760px]">
-            {/* Main Heading */}
-            <h1 className="font-serif text-white text-5xl sm:text-6xl lg:text-[72px] leading-[0.98] tracking-[-0.025em] font-normal">
-              The Mediterranean table,
-              <br />
-              brought to your celebration
-            </h1>
-
-            {/* Description */}
-            <p className="mt-7 max-w-[650px] text-sm sm:text-base leading-7 text-white/85 font-light">
-              Chef-crafted collections built on olive oil, citrus, charcoal and
-              the generosity of a long table shared with people you love.
-            </p>
-            {/* Working Hours */}
-            <div className="mt-5 text-white/80 text-xs sm:text-sm">
-              <span className="mx-2 text-white/40">•</span>
-              <span>Sun–Thu: 11 AM–10 PM</span>
-              <span className="mx-2 text-white/40">•</span>
-              <span>Fri–Sat: 11 AM–1 AM</span>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a
-                href="#guests"
-                className="px-9 py-4 bg-[#D56A38] text-white text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-[#C45C2D] transition-colors"
-              >
-                Build Your Event
-              </a>
-
-              <a
-                href="#about-us"
-                className="px-9 py-4 border border-white/45 bg-black/10 text-white text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-white hover:text-[#0B2240] transition-all"
-              >
-                Meet Our Story
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* About us Section */}
+      <AboutUs />
+      <KitchenInfo />
 
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {loading && (
@@ -415,134 +298,6 @@ export const CustomerPage: React.FC = () => {
 
         {!loading && !error && (
           <>
-            <section id="about-us" className="bg-[#FBF9F6] py-20 sm:py-28">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                  {/* Image */}
-                  <div className="relative order-2 lg:order-1">
-                    <div className="relative rounded-3xl overflow-hidden border border-[#EFECE6] shadow-lg bg-[#FAF8F5]">
-                      <img
-                        src="/assets/about-olive-coast.jpg"
-                        alt="Olive Coast Mediterranean kitchen spread"
-                        className="w-full h-[400px] sm:h-[500px] object-cover"
-                      />
-                    </div>
-                    {/* Floating badge */}
-                    <div className="absolute -bottom-6 -right-6 sm:bottom-8 sm:right-8 bg-white rounded-2xl shadow-xl border border-[#EFECE6] p-5 max-w-[220px]">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-[#0B2240] flex items-center justify-center text-white shrink-0">
-                          <Users size={22} />
-                        </div>
-                        <div>
-                          <p className="text-2xl font-serif font-bold text-[#0B2240]">
-                            20+
-                          </p>
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                            Guests per event
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="space-y-6 order-1 lg:order-2">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D56A38]">
-                      Our Story
-                    </span>
-
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#0B2240] leading-[1.1]">
-                      The Mediterranean table,
-                      <span className="text-[#607A41]">
-                        {" "}
-                        made for gathering
-                      </span>
-                    </h2>
-
-                    <p className="text-sm sm:text-base text-slate-600 leading-7 font-light">
-                      Olive Coast was built on a simple idea: great food brings
-                      people together. We craft chef-inspired Mediterranean
-                      collections for events of all kinds — weddings, corporate
-                      dinners, family celebrations, and everything in between.
-                    </p>
-
-                    <p className="text-sm sm:text-base text-slate-600 leading-7 font-light">
-                      Every collection is prepared with fresh olive oil, citrus,
-                      herbs, and the same care we would serve at our own table.
-                      From hummus and falafel to grilled vegetables and artisan
-                      bread, we keep the flavors honest, the portions generous,
-                      and the experience effortless.
-                    </p>
-
-                    {/* Feature grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#0B2240]/5 flex items-center justify-center text-[#0B2240] shrink-0">
-                          <Leaf size={20} />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-bold text-[#0B2240]">
-                            Fresh Ingredients
-                          </h3>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#0B2240]/5 flex items-center justify-center text-[#0B2240] shrink-0">
-                          <Users size={20} />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-bold text-[#0B2240]">
-                            Made for Groups
-                          </h3>
-                          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                            Designed for events of 20 guests and up.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#0B2240]/5 flex items-center justify-center text-[#0B2240] shrink-0">
-                          <Clock size={20} />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-bold text-[#0B2240]">
-                            Event-Day Ready
-                          </h3>
-                          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                            Prepared fresh and delivered on your schedule.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#0B2240]/5 flex items-center justify-center text-[#0B2240] shrink-0">
-                          <MapPin size={20} />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-bold text-[#0B2240]">
-                            Local Delivery
-                          </h3>
-                          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                            We bring the table to your venue.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* CTA */}
-                    <div className="pt-4">
-                      <a
-                        href="#packages"
-                        className="inline-flex items-center justify-center px-8 py-4 bg-[#0B2240] text-white text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-[#15345b] transition-colors rounded-xl"
-                      >
-                        Explore Our Collections
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
             {/* Kitchen Info / Hours Section with [photo 2] */}
             <section className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white rounded-3xl border border-[#EFECE6] shadow-sm">
               {/* Image */}
@@ -700,8 +455,8 @@ export const CustomerPage: React.FC = () => {
                     ))}
                   </div>
                 </section>
-
                 {/* Step 2: Pick a package */}
+                // 📁 Inside your parent component
                 <section id="packages" className="space-y-4 scroll-mt-28">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C05621]">
                     Step Two
@@ -720,75 +475,17 @@ export const CustomerPage: React.FC = () => {
                       </h3>
 
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
-                        {/* Classic Collection */}
                         {packages
                           .filter((pkg) => pkg.name === "Classic Collection")
-                          .map((pkg) => {
-                            const isSelected = selectedPackage?.id === pkg.id;
-
-                            return (
-                              <div
-                                key={pkg.id}
-                                onClick={() => setSelectedPackage(pkg)}
-                                className={`group relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex min-h-[220px] ${
-                                  isSelected
-                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10"
-                                    : "border-[#EFECE6] hover:border-[#DCD7CC] hover:shadow-md"
-                                }`}
-                              >
-                                {/* IMAGE */}
-                                <div className="relative w-[24%] min-w-[90px] overflow-hidden">
-                                  <img
-                                    src={packageImages[pkg.name]}
-                                    alt={pkg.name}
-                                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                  />
-
-                                  {/* Image Overlay */}
-                                  <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-transparent to-black/20" />
-
-                                  {/* Decorative Accent */}
-                                  <div className="absolute left-3 top-3 h-8 w-[2px] rounded-full bg-white/80" />
-                                </div>
-
-                                {/* CONTENT */}
-                                <div className="relative flex flex-1 flex-col justify-between p-5">
-                                  {/* Selected Check */}
-                                  {isSelected && (
-                                    <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#0B2240] text-white shadow-sm">
-                                      <Check size={14} strokeWidth={3} />
-                                    </div>
-                                  )}
-
-                                  {/* Package Info */}
-                                  <div className={isSelected ? "pr-8" : ""}>
-                                    <h3 className="font-bold text-[#0B2240] text-base">
-                                      {pkg.name}
-                                    </h3>
-
-                                    <p className="text-xs text-slate-500 mt-1 line-clamp-3 leading-relaxed">
-                                      {pkg.description}
-                                    </p>
-                                  </div>
-
-                                  {/* Price */}
-                                  <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
-                                    <span className="font-black text-[#0B2240] text-base">
-                                      $
-                                      {parseFloat(pkg.pricePerPerson).toFixed(
-                                        2,
-                                      )}
-                                    </span>
-
-                                    <span className="text-xs text-slate-400 font-medium">
-                                      {" "}
-                                      /guest
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
+                          .map((pkg) => (
+                            <PackageCard
+                              key={pkg.id}
+                              pkg={pkg}
+                              imageUrl={packageImages[pkg.name]}
+                              isSelected={selectedPackage?.id === pkg.id}
+                              onSelect={setSelectedPackage}
+                            />
+                          ))}
 
                         {/* Middle Image */}
                         <div className="relative overflow-hidden rounded-2xl min-h-[220px] lg:min-h-0">
@@ -797,80 +494,20 @@ export const CustomerPage: React.FC = () => {
                             alt="Mediterranean catering"
                             className="absolute inset-0 w-full h-full object-cover"
                           />
-
-                          {/* Subtle Overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-[#0B2240]/30 via-transparent to-transparent" />
                         </div>
 
-                        {/* Signature Collection */}
                         {packages
                           .filter((pkg) => pkg.name === "Signature Collection")
-                          .map((pkg) => {
-                            const isSelected = selectedPackage?.id === pkg.id;
-
-                            return (
-                              <div
-                                key={pkg.id}
-                                onClick={() => setSelectedPackage(pkg)}
-                                className={`group relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex min-h-[220px] ${
-                                  isSelected
-                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10"
-                                    : "border-[#EFECE6] hover:border-[#DCD7CC] hover:shadow-md"
-                                }`}
-                              >
-                                {/* IMAGE */}
-                                <div className="relative w-[24%] min-w-[90px] overflow-hidden">
-                                  <img
-                                    src={packageImages[pkg.name]}
-                                    alt={pkg.name}
-                                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                  />
-
-                                  {/* Image Overlay */}
-                                  <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-transparent to-black/20" />
-
-                                  {/* Decorative Accent */}
-                                  <div className="absolute left-3 top-3 h-8 w-[2px] rounded-full bg-white/80" />
-                                </div>
-
-                                {/* CONTENT */}
-                                <div className="relative flex flex-1 flex-col justify-between p-5">
-                                  {/* Selected Check */}
-                                  {isSelected && (
-                                    <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#0B2240] text-white shadow-sm">
-                                      <Check size={14} strokeWidth={3} />
-                                    </div>
-                                  )}
-
-                                  {/* Package Info */}
-                                  <div className={isSelected ? "pr-8" : ""}>
-                                    <h3 className="font-bold text-[#0B2240] text-base">
-                                      {pkg.name}
-                                    </h3>
-
-                                    <p className="text-xs text-slate-500 mt-1 line-clamp-3 leading-relaxed">
-                                      {pkg.description}
-                                    </p>
-                                  </div>
-
-                                  {/* Price */}
-                                  <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
-                                    <span className="font-black text-[#0B2240] text-base">
-                                      $
-                                      {parseFloat(pkg.pricePerPerson).toFixed(
-                                        2,
-                                      )}
-                                    </span>
-
-                                    <span className="text-xs text-slate-400 font-medium">
-                                      {" "}
-                                      /guest
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
+                          .map((pkg) => (
+                            <PackageCard
+                              key={pkg.id}
+                              pkg={pkg}
+                              imageUrl={packageImages[pkg.name]}
+                              isSelected={selectedPackage?.id === pkg.id}
+                              onSelect={setSelectedPackage}
+                            />
+                          ))}
                       </div>
                     </div>
 
@@ -888,76 +525,20 @@ export const CustomerPage: React.FC = () => {
                               pkg.name === "Mediterranean Collection" ||
                               pkg.name === "Luxury Collection",
                           )
-                          .map((pkg) => {
-                            const isSelected = selectedPackage?.id === pkg.id;
-
-                            return (
-                              <div
-                                key={pkg.id}
-                                onClick={() => setSelectedPackage(pkg)}
-                                className={`group relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all bg-white shadow-sm flex min-h-[220px] ${
-                                  isSelected
-                                    ? "border-[#0B2240] ring-2 ring-[#0B2240]/10"
-                                    : "border-[#EFECE6] hover:border-[#DCD7CC] hover:shadow-md"
-                                }`}
-                              >
-                                {/* IMAGE */}
-                                <div className="relative w-[24%] min-w-[90px] overflow-hidden">
-                                  <img
-                                    src={packageImages[pkg.name]}
-                                    alt={pkg.name}
-                                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                  />
-
-                                  {/* Image Overlay */}
-                                  <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-transparent to-black/20" />
-
-                                  {/* Decorative Accent */}
-                                  <div className="absolute left-3 top-3 h-8 w-[2px] rounded-full bg-white/80" />
-                                </div>
-
-                                {/* CONTENT */}
-                                <div className="relative flex flex-1 flex-col justify-between p-5">
-                                  {/* Selected Check */}
-                                  {isSelected && (
-                                    <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#0B2240] text-white shadow-sm">
-                                      <Check size={14} strokeWidth={3} />
-                                    </div>
-                                  )}
-
-                                  {/* Package Info */}
-                                  <div className={isSelected ? "pr-8" : ""}>
-                                    <h3 className="font-bold text-[#0B2240] text-base">
-                                      {pkg.name}
-                                    </h3>
-
-                                    <p className="text-xs text-slate-500 mt-1 line-clamp-3 leading-relaxed">
-                                      {pkg.description}
-                                    </p>
-                                  </div>
-
-                                  {/* Price */}
-                                  <div className="mt-4 pt-3 border-t border-[#FAF8F5]">
-                                    <span className="font-black text-[#0B2240] text-base">
-                                      $
-                                      {parseFloat(pkg.pricePerPerson).toFixed(
-                                        2,
-                                      )}
-                                    </span>
-
-                                    <span className="text-xs text-slate-400 font-medium">
-                                      {" "}
-                                      /guest
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
+                          .map((pkg) => (
+                            <PackageCard
+                              key={pkg.id}
+                              pkg={pkg}
+                              imageUrl={packageImages[pkg.name]}
+                              isSelected={selectedPackage?.id === pkg.id}
+                              onSelect={setSelectedPackage}
+                            />
+                          ))}
                       </div>
                     </div>
                   </div>
 
+                  {/* Selected Package Details Dropdown/Box */}
                   {selectedPackage && (
                     <div
                       ref={packageDetailsRef}
@@ -986,7 +567,6 @@ export const CustomerPage: React.FC = () => {
                                         size={13}
                                         className="text-[#0B2240] shrink-0"
                                       />
-
                                       <span>{item}</span>
                                     </li>
                                   ),
@@ -1003,7 +583,6 @@ export const CustomerPage: React.FC = () => {
                     </div>
                   )}
                 </section>
-
                 {/* Step 3 & 4: Upgrades & Drinks */}
                 <div
                   id="food-upgrades"
@@ -1121,7 +700,6 @@ export const CustomerPage: React.FC = () => {
                     </section>
                   )}
                 </div>
-
                 {/* Step 5: Event Logistics & Notes */}
                 <section
                   id="logistics"
