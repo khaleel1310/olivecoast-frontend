@@ -628,7 +628,7 @@ export const CustomerPage: React.FC = () => {
                 >
                   <div className="relative h-64 overflow-hidden">
                     <img
-                      src="/assets/luxury-collection.jpg"
+                      src="/assets/wedding.jpg"
                       alt="Wedding catering"
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
