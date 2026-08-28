@@ -277,7 +277,7 @@ export const CustomerPage: React.FC = () => {
 
   const grandTotal = subtotalWithExtras + tax + tipAmount;
 
-  const downPayment = grandTotal * 0.25;
+  const downPayment = grandTotal * 0.30;
 
   const effectivePerPerson =
     guestCount > 0 ? grandTotal / guestCount : 0;
@@ -1922,7 +1922,7 @@ export const CustomerPage: React.FC = () => {
                     {/* Down Payment */}
                     <div className="flex justify-between font-bold text-white pt-3 border-t border-dashed border-[#1C3527]">
                       <span>
-                        Refundable Down Payment (25%)
+                        Refundable Down Payment (30%)
                       </span>
 
                       <span>
@@ -1937,9 +1937,7 @@ export const CustomerPage: React.FC = () => {
                     </div>
 
                     <p className="text-[10px] text-slate-300 italic">
-                      The down payment is fully refundable if
-                      canceled within 72 hours of placing the
-                      order.
+                      The down payment is fully refundable if canceled up to 4 days before the event. Cancellations within 4 days of the event are subject to a 5% refundable rate.
                     </p>
                   </div>
 
@@ -1963,7 +1961,7 @@ export const CustomerPage: React.FC = () => {
                     >
                       <DollarSign size={16} />
 
-                      Pay 25% Down Payment via Stripe
+                      Pay 30% Down Payment via Stripe
                     </button>
 
                     <p className="text-[11px] text-center text-slate-300 mt-3 leading-relaxed">
